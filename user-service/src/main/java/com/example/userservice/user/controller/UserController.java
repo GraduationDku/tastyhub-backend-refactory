@@ -33,18 +33,18 @@ public class UserController {
     // 프론트엔드에서 authorization_code를 받아오는 API
     @PostMapping("/login/oauth2/code/apple")
     @ResponseBody
-    public StatusResponse appleLogin(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
+    public ResponseEntity<StatusResponse> appleLogin(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         String code = requestBody.get("code");
         userService.appleLogin(code, response);
-        return new StatusResponse(200, "요청 성공");
+        return RESPONSE_OK;
     }
 
     @PostMapping("/refresh")
     @ResponseBody
-    public StatusResponse refreshAccessToken(
+    public ResponseEntity<StatusResponse> refreshAccessToken(
             @RequestParam String nickName, HttpServletResponse response) {
         userService.refreshAccessToken(nickName, response);
-        return new StatusResponse(200, "요청 성공");
+        return RESPONSE_OK;
     }
 
 

@@ -1,3 +1,4 @@
 .idea
 application.yaml
 .gradle
+*.p8
