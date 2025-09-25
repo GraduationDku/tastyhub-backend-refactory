@@ -1,4 +1,4 @@
-package com.example.userservice.utils.headers;
+package org.example.headers;
 
 import jakarta.mail.Header;
 import org.springframework.http.HttpHeaders;

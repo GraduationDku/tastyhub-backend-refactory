@@ -1,6 +1,6 @@
-package com.example.userservice.utils.headers;
+package org.example.headers;
 
-import com.example.userservice.utils.headers.enums.ResponseMessages;
+import org.example.headers.enums.ResponseMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

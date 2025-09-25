@@ -1,4 +1,4 @@
-package com.example.userservice.utils.headers.enums;
+package org.example.headers.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

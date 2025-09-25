@@ -29,8 +29,8 @@ public class NicknameGenerator {
 
     @PostConstruct
     public void init() throws IOException {
-        loadWords("claaspath:resources/adjective.txt", adjectives);
-        loadWords("claaspath:resources/noun.txt", nouns);
+        loadWords("classpath:adjective.txt", adjectives);
+        loadWords("classpath:noun.txt", nouns);
     }
 
     public String generate(String userName) {
