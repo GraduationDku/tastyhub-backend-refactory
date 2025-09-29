@@ -27,6 +27,7 @@ import static org.example.headers.HttpResponseEntity.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/recipe")
 public class RecipeController {
 
     private static final Logger log = LoggerFactory.getLogger(RecipeController.class);
