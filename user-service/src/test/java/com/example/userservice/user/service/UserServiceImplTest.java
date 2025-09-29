@@ -6,9 +6,9 @@ import com.example.userservice.user.repository.UserRepository;
 import com.example.userservice.utils.auth.apple.AppleAuthService;
 import com.example.userservice.utils.auth.apple.AppleTokenResponse;
 import com.example.userservice.utils.auth.apple.AppleUserInfo;
-import com.example.userservice.utils.jwt.JwtUtils;
 import com.example.userservice.utils.nickName.NicknameGenerator;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,8 +82,8 @@ class UserServiceImplTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.appleLogin("test_code", response);
 
-        verify(jwtUtils).createAccessToken(testUser.getNickname(), testUser.getUserType());
-        verify(jwtUtils).createRefreshToken(testUser.getNickname(), String.valueOf(testUser.getUserType()));
+        verify(jwtUtils).createAccessToken(testUser.getNickname(), testUser.getUserType().toString());
+        verify(jwtUtils).createRefreshToken(testUser.getNickname(), String.valueOf(testUser.getUserType().toString()));
     }
 
     @Test
@@ -113,7 +113,7 @@ class UserServiceImplTest {
         given(jwtUtils.getRefreshToken(testUser.getUserName())).willReturn("valid_refresh_token");
         given(jwtUtils.isTokenValid("valid_refresh_token")).willReturn(true);
 
-        given(jwtUtils.createAccessToken(testUser.getNickname(), testUser.getUserType())).willReturn("new_access_token");
+        given(jwtUtils.createAccessToken(testUser.getNickname(), testUser.getUserType().toString())).willReturn("new_access_token");
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.refreshAccessToken("testuser", response);

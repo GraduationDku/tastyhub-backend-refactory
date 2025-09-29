@@ -1,4 +1,4 @@
-package com.example.recipeservice.recipe.repository;
+package com.example.recipeservice.recipe.repository.ingredient;
 
 import com.example.recipeservice.recipe.entity.Ingredient;
 import org.springframework.data.jpa.repository.JpaRepository;

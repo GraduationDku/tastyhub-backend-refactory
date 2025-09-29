@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -47,8 +50,14 @@ public class Recipe {
     @Column(name = "user_name")
     private String username;
 
+    @OneToOne(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private FoodInformation foodInformation;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    List<CookStep> cookSteps = new ArrayList<>();
 
-
-
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    List<Ingredient> ingredients = new ArrayList<>();
 }

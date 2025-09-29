@@ -1,9 +1,9 @@
 package com.example.userservice.config;
 
-import com.example.userservice.utils.jwt.JwtAuthFilter;
-import com.example.userservice.utils.jwt.JwtAuthenticationEntryPoint;
-import com.example.userservice.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.example.jwt.JwtAuthFilter;
+import org.example.jwt.JwtAuthenticationEntryPoint;
+import org.example.jwt.JwtUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

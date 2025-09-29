@@ -1,8 +1,8 @@
-package com.example.userservice.utils.jwt;
+package org.example.jwt;
 
-import com.example.userservice.user.entity.User;
+
+
 import com.example.userservice.utils.redis.RedisUtils;
-
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class JwtUtils
     }
 
 
-    public String createAccessToken(String username, User.UserType role) {
+    public String createAccessToken(String username, String role) {
 
         Claims claims = Jwts.claims();
         claims.put(AUTHORIZATION_KEY, role);
@@ -151,5 +151,16 @@ public class JwtUtils
 
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+    }
+
+    public String extractUsername(String authHeader) {
+        return extractAllClaims(authHeader).getSubject();
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token.replace("Bearer ", ""))
+                .getBody();
     }
 }

@@ -1,4 +1,4 @@
-package com.example.recipeservice.recipe.repository;
+package com.example.recipeservice.recipe.repository.cookStep;
 
 import com.example.recipeservice.recipe.entity.CookStep;
 import org.springframework.data.jpa.repository.JpaRepository;
