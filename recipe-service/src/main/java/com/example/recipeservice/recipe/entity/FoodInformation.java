@@ -1,6 +1,7 @@
 package com.example.recipeservice.recipe.entity;
 
 
+import com.example.recipeservice.recipe.dtos.FoodInformationCreateDto;
 import com.example.recipeservice.recipe.dtos.FoodInformationDto;
 import com.example.recipeservice.recipe.dtos.RecipeCreateDto;
 import jakarta.persistence.*;
@@ -40,6 +41,12 @@ public class FoodInformation extends TimeStamp {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
+    public FoodInformation(FoodInformationCreateDto foodInformation) {
+        this.content = foodInformation.getContent();
+        this.cookingTime = foodInformation.getCookingTime();
+        this.serving = foodInformation.getServing();
+    }
+
 
     public void updateByFoodInformationDto(FoodInformationDto foodInformationDto) {
         this.content = foodInformationDto.getContent();
@@ -47,7 +54,7 @@ public class FoodInformation extends TimeStamp {
         this.serving = foodInformationDto.getServing();
     }
 
-    public void setRecipe(Recipe recipe) {
+    public void relationRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
 
@@ -64,4 +71,8 @@ public class FoodInformation extends TimeStamp {
     }
 
 
+    public void update(FoodInformationDto foodInformation) {
+        this.content = foodInformation.getContent();
+        this.cookingTime = foodInformation.getCookingTime();
+    }
 }

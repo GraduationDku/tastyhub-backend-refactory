@@ -41,6 +41,11 @@ public class CookStep extends TimeStamp {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
+    public CookStep(CookStepDto cookStepDto) {
+        this.stepNumber = cookStepDto.getStepNumber();
+        this.content = cookStepDto.getContent();
+    }
+
     public static CookStep makeCookStep(CookStepCreateRequest cookStepCreateRequest, String imageUrl) {
         return CookStep.builder()
                 .stepNumber(cookStepCreateRequest.getStepNumber())
@@ -64,7 +69,7 @@ public class CookStep extends TimeStamp {
     }
 
 
-    public void setRecipe(Recipe recipe) {
+    public void relationRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
 

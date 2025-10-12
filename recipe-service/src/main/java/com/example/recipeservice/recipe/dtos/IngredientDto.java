@@ -19,4 +19,7 @@ public class IngredientDto {
         this.ingredientName = ingredient.getIngredientName();
         this.amount = ingredient.getAmount();
     }
+    public Ingredient toEntity() {
+        return new Ingredient(this);
+    }
 }

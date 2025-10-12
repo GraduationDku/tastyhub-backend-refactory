@@ -23,4 +23,8 @@ public class CookStepDto {
         this.stepImgUrl = cookStep.getStepImgUrl();
         this.content = cookStep.getContent();
     }
+
+    public CookStep toEntity() {
+        return new CookStep(this);
+    }
 }

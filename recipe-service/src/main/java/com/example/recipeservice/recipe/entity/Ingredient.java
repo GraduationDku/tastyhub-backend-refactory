@@ -37,6 +37,17 @@ public class Ingredient extends TimeStamp {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
+    public Ingredient(String ingredientName, String amount) {
+        this.ingredientName = ingredientName;
+        this.amount = amount;
+    }
+
+    public Ingredient(IngredientDto ingredientDto) {
+        this.id = ingredientDto.getIngredientId();
+        this.ingredientName = ingredientDto.getIngredientName();
+        this.amount = ingredientDto.getAmount();
+    }
+
 
     public static Ingredient makeIngredient(IngredientCreateDto ingredientCreateDto) {
         return Ingredient.builder()
@@ -51,7 +62,7 @@ public class Ingredient extends TimeStamp {
 
     }
 
-    public void setRecipe(Recipe recipe) {
+    public void relationRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
 

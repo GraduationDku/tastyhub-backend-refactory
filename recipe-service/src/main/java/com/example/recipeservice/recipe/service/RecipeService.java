@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 public interface RecipeService {
@@ -23,7 +24,7 @@ public interface RecipeService {
 
     void createRecipe(RecipeCreateDto recipeCreateDto, MultipartFile recipeImg, List<MultipartFile> cookStepImgs, String username);
 
-    void updateRecipe(Long recipeId, MultipartFile img, String username, RecipeUpdateDto recipeUpdateDto);
+    void updateRecipe(Long recipeId, MultipartFile img, String username, RecipeUpdateDto recipeUpdateDto) throws IllegalAccessException, AccessDeniedException;
 
-    void deleteRecipe(Long recipeId, String username);
+    void deleteRecipe(Long recipeId, String username) throws AccessDeniedException;
 }

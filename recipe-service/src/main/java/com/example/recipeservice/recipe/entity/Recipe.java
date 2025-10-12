@@ -1,5 +1,7 @@
 package com.example.recipeservice.recipe.entity;
 
+import com.example.recipeservice.recipe.dtos.FoodInformationDto;
+import com.example.recipeservice.recipe.dtos.RecipeCreateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +21,26 @@ import java.util.List;
 @Entity
 @DynamicUpdate
 public class Recipe {
+
+    public static Recipe createRecipe(RecipeCreateDto recipeCreateDto, String username, String imgUrl, FoodInformation foodInformation, List<Ingredient> ingredients, List<CookStep> cookSteps) {
+        return new Recipe().builder()
+                .recipeImgUrl(imgUrl)
+                .username(username)
+                .foodInformation(foodInformation)
+                .ingredients(ingredients)
+                .cookSteps(cookSteps)
+                .foodName(recipeCreateDto.getFoodName())
+                .recipeType(recipeCreateDto.getRecipeType())
+                .build();
+    }
+
+    public void update(String foodName, String newImgUrl, List<Ingredient> newIngredients, List<CookStep> newCookSteps) {
+
+        this.ingredients = newIngredients;
+        this.cookSteps = newCookSteps;
+        this.foodName = foodName;
+        this.recipeImgUrl = newImgUrl;
+    }
 
     public enum RecipeType {
         Image,
@@ -60,4 +82,8 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     List<Ingredient> ingredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    List<Like> likes = new ArrayList<>();
 }
