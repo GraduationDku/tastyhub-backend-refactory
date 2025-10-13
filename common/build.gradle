@@ -1,39 +1,14 @@
-plugins {
-    id 'java'
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-group = 'org.example'
-version = '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
+description = 'common'
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.5.5'
+    // 버전은 최상위 build.gradle의 dependency-management 플러그인이 관리합니다.
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.5.4'
     implementation 'jakarta.mail:jakarta.mail-api:2.1.2'
 
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
-
-
-}
-
-test {
-    useJUnitPlatform()
 }
