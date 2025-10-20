@@ -42,7 +42,7 @@ subprojects {
 
 
 configure(subprojects.findAll {
-    it.name.endsWith('-service')
+    it.name.endsWith('-service') || it.name=='common'
 }) {
     dependencies {
         implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

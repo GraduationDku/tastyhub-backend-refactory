@@ -1,5 +1,6 @@
 package org.example.jwt;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import io.jsonwebtoken.Claims;

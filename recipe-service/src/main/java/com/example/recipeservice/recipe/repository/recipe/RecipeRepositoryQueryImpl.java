@@ -10,8 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
-
 public class RecipeRepositoryQueryImpl extends QuerydslRepositorySupport implements RecipeRepositoryQuery {
+
+    private JPAQueryFactory jpaQueryFactory;
 
 
     public RecipeRepositoryQueryImpl(JPAQueryFactory jpaQueryFactory) {

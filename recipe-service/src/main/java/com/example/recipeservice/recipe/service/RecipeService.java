@@ -24,7 +24,7 @@ public interface RecipeService {
 
     void createRecipe(RecipeCreateDto recipeCreateDto, MultipartFile recipeImg, List<MultipartFile> cookStepImgs, String username);
 
-    void updateRecipe(Long recipeId, MultipartFile img, String username, RecipeUpdateDto recipeUpdateDto) throws IllegalAccessException, AccessDeniedException;
+    void updateRecipe(Long recipeId, MultipartFile img, String username, RecipeUpdateDto recipeUpdateDto) ;
 
-    void deleteRecipe(Long recipeId, String username) throws AccessDeniedException;
+    void deleteRecipe(Long recipeId, String username) ;
 }

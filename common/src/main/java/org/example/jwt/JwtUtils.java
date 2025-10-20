@@ -1,12 +1,14 @@
 package org.example.jwt;
 
+import org.springframework.context.annotation.Lazy;
 
 
-import com.example.userservice.utils.redis.RedisUtils;
+
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -14,11 +16,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 
+@Lazy
 @Component
 @Slf4j
-public class JwtUtils
-{
+public class JwtUtils {
 
     private final SecretKey secretKey;
     //Auth
@@ -32,10 +35,10 @@ public class JwtUtils
 
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final RedisUtils redisUtils;
+    private final Optional<TokenStorageService> tokenStorageService;
 
-    public JwtUtils(@Value("${jwt.secret-key}") String base64Key, RedisUtils redisUtils) {
-        this.redisUtils = redisUtils;
+    public JwtUtils(@Value("${jwt.secret-key}") String base64Key, Optional<TokenStorageService> tokenStorageService) {
+        this.tokenStorageService = tokenStorageService;
         byte[] keyBytes = Base64.getDecoder().decode(base64Key);
         this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
@@ -69,8 +72,9 @@ public class JwtUtils
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
                 .signWith(secretKey)
                 .compact();
-
-        redisUtils.saveData(username, refreshToken, REFRESH_TOKEN_TIME);
+        if(tokenStorageService.isPresent()) {
+            tokenStorageService.get().saveData(username, refreshToken, REFRESH_TOKEN_TIME);
+        }
 
     }
 
@@ -129,13 +133,19 @@ public class JwtUtils
     }
 
     public String getRefreshToken(String username) {
-        Object token = redisUtils.getData(username);
+        Object token = null;
+        if (tokenStorageService.isPresent()) {
+            token = tokenStorageService.get().getData(username);
+        }
         return token != null ? token.toString() : null;
     }
 
     public boolean deleteRefreshToken(String username) {
         try {
-            Boolean isDeleted = redisUtils.deleteData(username);
+            Boolean isDeleted = false;
+            if (tokenStorageService.isPresent()) {
+                isDeleted = tokenStorageService.get().deleteData(username);
+            }
             if (Boolean.TRUE.equals(isDeleted)) {
                 log.info("리프레시 토큰 삭제 성공: {}", username);
                 return true;

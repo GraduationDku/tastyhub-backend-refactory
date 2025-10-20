@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,9 +95,9 @@ public class RecipeServiceImpl implements RecipeService {
         String newImgUrl = originalImgUrl;
 
         // 2. 이미지 파일 처리
-        if (img != null && !img.isEmpty()) {
-            // newImgUrl = s3Uploader.upload(img, "image/recipeImg");
-        }
+//        if (img != null && !img.isEmpty()) {
+//            // newImgUrl = s3Uploader.upload(img, "image/recipeImg");
+//        }
 
         // 3. 연관 엔티티 직접 업데이트
         // 3-1. FoodInformation 업데이트 (FoodInformation 엔티티에 update 메소드가 있다고 가정)
@@ -115,10 +115,10 @@ public class RecipeServiceImpl implements RecipeService {
                 newCookSteps
         );
 
-        // 5. 기존 이미지 삭제
-        if (newImgUrl != null && !newImgUrl.equals(originalImgUrl)) {
-            // s3Uploader.delete(originalImgUrl);
-        }
+//        // 5. 기존 이미지 삭제
+//        if (newImgUrl != null && !newImgUrl.equals(originalImgUrl)) {
+//            // s3Uploader.delete(originalImgUrl);
+//        }
     }
 
     private List<Ingredient> createIngredientsByUpdateDto
