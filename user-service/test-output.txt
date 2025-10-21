@@ -1,0 +1,34 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :test
+
+UserControllerTest > 로그아웃 테스트 FAILED
+    java.lang.AssertionError at UserControllerTest.java:176
+
+UserControllerTest > 액세스 토큰 재발급 테스트 FAILED
+    java.lang.AssertionError at UserControllerTest.java:112
+
+UserControllerTest > 애플 로그인 테스트 FAILED
+    java.lang.AssertionError at UserControllerTest.java:94
+
+UserControllerTest > 회원 탈퇴 테스트 FAILED
+    java.lang.AssertionError at UserControllerTest.java:156
+
+UserControllerTest > 사용자 목록 검색 테스트 FAILED
+    java.lang.NullPointerException at UserControllerTest.java:142
+
+> Task :test FAILED
+
+[Incubating] Problems report is available at: file:///Users/gimminsoo/Desktop/refactory/user-service/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+4 actionable tasks: 1 executed, 3 up-to-date

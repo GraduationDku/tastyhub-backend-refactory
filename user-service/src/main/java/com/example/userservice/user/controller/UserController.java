@@ -2,7 +2,6 @@ package com.example.userservice.user.controller;
 
 import com.example.userservice.user.dtos.UserDto;
 import com.example.userservice.user.service.UserService;
-import com.example.userservice.utils.headers.StatusResponse;
 import com.example.userservice.utils.auth.userDetails.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +16,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.example.headers.StatusResponse;
+import static org.example.headers.HttpResponseEntity.RESPONSE_OK;
+import static org.example.headers.HttpResponseEntity.INTERNAL_SERVER_ERROR;
+
 import java.io.IOException;
 import java.util.Map;
-
-import static com.example.userservice.utils.headers.HttpResponseEntity.*;
 
 
 @RestController
@@ -31,6 +32,7 @@ public class UserController {
 
     // 프론트엔드에서 authorization_code를 받아오는 API
     @PostMapping("/login/oauth2/code/apple")
+    @ResponseBody
     public ResponseEntity<StatusResponse> appleLogin(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         String code = requestBody.get("code");
         userService.appleLogin(code, response);
@@ -38,14 +40,11 @@ public class UserController {
     }
 
     @PostMapping("/refresh")
+    @ResponseBody
     public ResponseEntity<StatusResponse> refreshAccessToken(
             @RequestParam String nickName, HttpServletResponse response) {
-        try {
-            userService.refreshAccessToken(nickName, response);
-            return RESPONSE_OK;
-        } catch (Exception e) {
-            return INTERNAL_SERVER_ERROR;
-        }
+        userService.refreshAccessToken(nickName, response);
+        return RESPONSE_OK;
     }
 
 
@@ -127,6 +126,11 @@ public class UserController {
                     "message", "서버 오류로 로그아웃 처리에 실패했습니다."
             ));
         }
+    }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello";
     }
 
     @PatchMapping(value = "/modify/information")

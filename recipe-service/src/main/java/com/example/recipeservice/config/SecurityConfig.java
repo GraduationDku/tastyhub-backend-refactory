@@ -1,0 +1,69 @@
+package com.example.recipeservice.config;
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.example.jwt.JwtAuthFilter;
+import org.example.jwt.JwtAuthenticationEntryPoint;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+
+//    private final JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    private final String [] permitArray={
+            "/recipe",
+            "/certification/{certificationId}/*",
+            "/subject/{subjectId}/*"
+    };
+
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,JwtAuthFilter jwtAuthFilter ) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(formLogin -> formLogin.disable()) // 추가
+                .httpBasic(httpBasic -> httpBasic.disable()) // 추가
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(permitArray).permitAll()
+                                .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("Unauthorized");
+                        }));
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+//        http.addFilterBefore(traceIdFilter, UsernamePasswordAuthenticationFilter.class)
+
+        return http.build();
+
+    }
+
+
+
+
+}

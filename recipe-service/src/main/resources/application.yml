@@ -1,0 +1,72 @@
+# ===============================================
+# Default Profile (기본 프로필)
+# ===============================================
+# Please update the username and password for your environment.
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='
+
+---
+# ===============================================
+# Docker Profile (Docker 환경용)
+# ===============================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://recipe-mysql:3306/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='
+
+---
+# ===============================================
+# Test Profile (테스트 환경용)
+# ===============================================
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='

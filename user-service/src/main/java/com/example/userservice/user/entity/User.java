@@ -14,7 +14,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @DynamicUpdate
 @Table(name = "users",indexes = {
-        @Index(name = "idx_username", columnList = "username"),
+        @Index(name = "idx_username", columnList = "user_name"),
         @Index(name = "idx_apple_id", columnList = "appleId")
 })
 @Entity
@@ -72,6 +72,7 @@ public class User  {
     public static User createAppleUser(String email, String appleId, String nickname) {
         return User.builder()
                 .email(email)
+                .userName(email.split("@")[0])
                 .appleId(appleId)
                 .nickname(nickname)
                 .userType(UserType.COMMON)

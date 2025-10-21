@@ -6,11 +6,11 @@ import com.example.userservice.user.repository.UserRepository;
 import com.example.userservice.utils.auth.apple.AppleAuthService;
 import com.example.userservice.utils.auth.apple.AppleTokenResponse;
 import com.example.userservice.utils.auth.apple.AppleUserInfo;
-import com.example.userservice.utils.jwt.JwtUtils;
 import com.example.userservice.utils.nickName.NicknameGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.jwt.JwtUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 5. 우리 서비스의 JWT 생성 및 응답 헤더에 추가
-        String accessToken = jwtUtils.createAccessToken(user.getNickname(), user.getUserType());
+        String accessToken = jwtUtils.createAccessToken(user.getNickname(), user.getUserType().toString());
         jwtUtils.createRefreshToken(user.getNickname(), String.valueOf(user.getUserType()));
         response.addHeader("Authorization", accessToken);
 
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByNickname(nickName).orElseThrow(() -> new UsernameNotFoundException("Nickname not found"));
         String refreshToken = jwtUtils.getRefreshToken(user.getUserName());
         if (jwtUtils.isTokenValid(refreshToken)) {
-            response.setHeader("Authorization", jwtUtils.createAccessToken(user.getNickname(), user.getUserType()));
+            response.setHeader("Authorization", jwtUtils.createAccessToken(user.getNickname(), user.getUserType().toString()));
         } else {
             throw new UsernameNotFoundException("Invalid refresh token");
         }

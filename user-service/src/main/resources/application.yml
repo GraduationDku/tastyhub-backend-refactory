@@ -1,0 +1,97 @@
+# ===============================================
+# Default Profile (for Local H2)
+# ===============================================
+server:
+  port: 8081
+
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:userdb
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+logging:
+  level:
+    com.example.userservice: DEBUG
+
+jwt:
+  secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='
+
+# Apple OAuth2 설정 추가
+apple:
+  team-id: "GTDR69XYWA"
+  client-id: "Seungeun-Park.TastyHub-iOS" # Services ID
+  key-id: "54446N73T5"
+  key-path: "classpath:keys/AuthKey_54446N73T5.p8"
+  auth-url: "https://appleid.apple.com"
+
+
+---
+# ===============================================
+# Docker Profile (for Docker-Composed MySQL)
+# ===============================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://user-mysql:3306/user_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='
+
+---
+# ===============================================
+# Test Profile (for Unit/Integration Tests)
+# ===============================================
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='

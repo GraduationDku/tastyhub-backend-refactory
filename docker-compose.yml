@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  mysql-user:
+    image: mysql:8.0
+    container_name: mysql-user
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_DATABASE: user_service_db
+    volumes:
+      - user-db:/var/lib/mysql
+
+  mysql-recipe:
+    image: mysql:8.0
+    container_name: mysql-recipe
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_DATABASE: recipe_service_db
+    volumes:
+      - recipe-db:/var/lib/mysql
+
+volumes:
+  user-db:
+  recipe-db:

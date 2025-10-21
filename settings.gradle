@@ -1,0 +1,5 @@
+rootProject.name = 'refactory'
+
+include 'common'
+include 'user-service'
+include 'recipe-service'
