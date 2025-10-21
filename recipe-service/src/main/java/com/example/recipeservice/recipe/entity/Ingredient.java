@@ -66,9 +66,8 @@ public class Ingredient extends TimeStamp {
         this.recipe = recipe;
     }
 
-    public void updateRelation(Recipe recipe) {
-
-        this.recipe = recipe;
+    public IngredientDto makeIngredientDto() {
+        return IngredientDto.builder().ingredientName(this.ingredientName).amount(this.amount).build();
     }
 
 }

@@ -76,4 +76,8 @@ public class CookStep extends TimeStamp {
     public void updateRelation(Recipe recipe) {
         this.recipe = recipe;
     }
+
+    public CookStepDto makeCookStepDto() {
+        return CookStepDto.builder().stepNumber(this.stepNumber).content(this.content).stepImgUrl(this.stepImgUrl).timeLine(this.timeline).build();
+    }
 }

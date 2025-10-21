@@ -43,7 +43,23 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public RecipeDto getRecipe(Long recipeId) {
-        return recipeRepository.getRecipe(recipeId);
+
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(EntityNotFoundException::new);
+        FoodInformationDto foodInformationDto = recipe.getFoodInformation().makeFoodInformationDto();
+        List<IngredientDto> ingredients = recipe.getIngredients().stream().map(Ingredient :: makeIngredientDto).toList();
+        List<CookStepDto> cookStepDtos = recipe.getCookSteps().stream().map(CookStep :: makeCookStepDto).toList();
+
+
+        return RecipeDto.builder()
+                .foodId(recipeId)
+                .foodName(recipe.getFoodName())
+                .recipeType(recipe.getRecipeType())
+                .foodInformation(foodInformationDto)
+                .foodImgUrl(recipe.getRecipeImgUrl())
+
+                .ingredients(ingredients)
+                .cookSteps(cookStepDtos)
+                .build();
     }
 
     @Override

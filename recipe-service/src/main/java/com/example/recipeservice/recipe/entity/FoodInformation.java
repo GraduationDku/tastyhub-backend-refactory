@@ -75,4 +75,13 @@ public class FoodInformation extends TimeStamp {
         this.content = foodInformation.getContent();
         this.cookingTime = foodInformation.getCookingTime();
     }
+
+    public FoodInformationDto makeFoodInformationDto() {
+        return FoodInformationDto.builder()
+                .foodInformationId(this.getId())
+                .content(this.content)
+                .cookingTime(this.cookingTime)
+                .serving(this.serving)
+                .build();
+    }
 }

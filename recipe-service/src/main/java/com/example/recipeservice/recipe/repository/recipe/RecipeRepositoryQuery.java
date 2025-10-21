@@ -12,7 +12,5 @@ public interface RecipeRepositoryQuery {
 
     Page<PagingRecipeResponse> getSearchedRecipes(String keyword, Pageable pageable);
 
-    RecipeDto getRecipe(Long recipeId);
-
     Page<PagingRecipeResponse> getMyRecipes(Pageable pageable, String username);
 }

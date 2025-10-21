@@ -3,3 +3,4 @@ application.yaml
 .gradle
 *.p8
 *.html
+application.yml
