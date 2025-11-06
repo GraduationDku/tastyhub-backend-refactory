@@ -3,7 +3,6 @@ package org.example.jwt;
 import org.springframework.context.annotation.Lazy;
 
 
-
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -59,21 +58,21 @@ public class JwtUtils {
                 .compact();
     }
 
-    public void createRefreshToken(String username, String role) {
+    public void createRefreshToken(String nickname, String role) {
 
         Claims claims = Jwts.claims();
         claims.put(REFRESH_KEY, role);
         claims.put("type", "refresh");
 
-        String refreshToken = BEARER_PREFIX + Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(nickname)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
                 .signWith(secretKey)
                 .compact();
-        if(tokenStorageService.isPresent()) {
-            tokenStorageService.get().saveData(username, refreshToken, REFRESH_TOKEN_TIME);
+        if (tokenStorageService.isPresent()) {
+            tokenStorageService.get().saveData(nickname, refreshToken, REFRESH_TOKEN_TIME);
         }
 
     }
@@ -86,20 +85,29 @@ public class JwtUtils {
         return "";
     }
 
+    private String stripBearerPrefix(String token) {
+        if (token == null) return "";
+        return token.startsWith(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
+    }
+
+    private Claims parseClaims(String token) {
+        String raw = stripBearerPrefix(token);
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(raw)
+                .getBody();
+    }
+
+
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            parseClaims(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token, 만료된 JWT token 입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+        }catch (Exception e){
+            log.info("Invaild Token: {}" ,e.getMessage());
+            return false;
         }
-        return false;
     }
 
     public boolean isRefreshTokenValid(String username, String token) {
@@ -110,32 +118,20 @@ public class JwtUtils {
                 log.warn("Refresh token not found in Redis or doesn't match");
                 return false;
             }
-            String actualToken = token.startsWith(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
             // 2. 토큰 자체 검증
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(actualToken)
-                    .getBody();
-
-            // 3. 토큰 유형 검증
+            Claims claims = parseClaims(token);
             String tokenType = claims.get("type", String.class);
-            if (!"refresh".equals(tokenType)) {
-                log.warn("This is not a refresh token");
-                return false;
-            }
-
-            return true;
+            return REFRESH_HEADER.equals(tokenType);
         } catch (Exception e) {
             log.info("Invalid refresh token: {}", e.getMessage());
             return false;
         }
     }
 
-    public String getRefreshToken(String username) {
+    public String getRefreshToken(String nickname) {
         Object token = null;
         if (tokenStorageService.isPresent()) {
-            token = tokenStorageService.get().getData(username);
+            token = tokenStorageService.get().getData(nickname);
         }
         return token != null ? token.toString() : null;
     }
@@ -160,17 +156,11 @@ public class JwtUtils {
     }
 
     public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+        return parseClaims(token);
     }
 
     public String extractUsername(String authHeader) {
-        return extractAllClaims(authHeader).getSubject();
+        return parseClaims(authHeader).getSubject();
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token.replace("Bearer ", ""))
-                .getBody();
-    }
 }

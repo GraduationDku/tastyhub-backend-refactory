@@ -42,6 +42,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,JwtAuthFilter jwtAuthFilter ) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .cors(corsConfiguration -> corsConfiguration.disable())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(formLogin -> formLogin.disable()) // 추가

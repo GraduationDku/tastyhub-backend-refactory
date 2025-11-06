@@ -84,10 +84,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserInfoByUserUpdateRequest(String newNickname, MultipartFile img, User user) {
-        if (!userRepository.existsByNickname(newNickname)) {
+        if (userRepository.existsByNickname(newNickname)) {
             throw new UsernameNotFoundException("Duplicated Nickname");
-        }
-        ;
+        };
         String imgUrl = ""; // 로컬 이미지 처리기 추가
         user.updateUserInfo(newNickname, imgUrl);
     }
@@ -95,9 +94,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void refreshAccessToken(String nickName, HttpServletResponse response) {
         User user = userRepository.findByNickname(nickName).orElseThrow(() -> new UsernameNotFoundException("Nickname not found"));
-        String refreshToken = jwtUtils.getRefreshToken(user.getUserName());
+
+        String refreshToken = jwtUtils.getRefreshToken(user.getNickname());
         if (jwtUtils.isTokenValid(refreshToken)) {
-            response.setHeader("Authorization", jwtUtils.createAccessToken(user.getNickname(), user.getUserType().toString()));
+            String newAccess = jwtUtils.createAccessToken(user.getNickname(), user.getUserType().toString());
+            response.setHeader("Authorization",newAccess );
         } else {
             throw new UsernameNotFoundException("Invalid refresh token");
         }
@@ -109,6 +110,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean delete(User user) {
         try {
             userRepository.delete(user);

@@ -17,7 +17,7 @@ public class RedisUtils implements TokenStorageService {
     @Override
     public void saveData(String key, String value, long expiration) {
         ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
-        Duration expireDuration = Duration.ofSeconds(expiration);
+        Duration expireDuration = Duration.ofMillis(expiration);
         valueOperations.set(key, value, expireDuration);
     }
     @Override
