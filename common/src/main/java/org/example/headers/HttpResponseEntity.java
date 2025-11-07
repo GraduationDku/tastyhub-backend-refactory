@@ -3,6 +3,7 @@ package org.example.headers;
 import org.example.headers.enums.ResponseMessages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 
@@ -20,7 +21,8 @@ public class HttpResponseEntity {
 
     // 2xx
     public static final ResponseEntity<StatusResponse> RESPONSE_OK =
-            ResponseEntity.status(ResponseMessages.SUCCESS.getStatusCode())
+            ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(StatusResponse.valueOf(ResponseMessages.SUCCESS));
     public static final ResponseEntity<StatusResponse> RESPONSE_CREATED =
             ResponseEntity.status(ResponseMessages.CREATED_SUCCESS.getStatusCode())

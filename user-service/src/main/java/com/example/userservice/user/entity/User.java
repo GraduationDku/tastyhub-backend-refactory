@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.timeStamp.TimeStamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
@@ -19,12 +20,11 @@ import org.hibernate.annotations.DynamicUpdate;
 })
 @Entity
 
-public class User  {
+public class User  extends TimeStamp {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tasty_hub_sequence")
-    @SequenceGenerator(name = "tasty_hub_sequence", sequenceName = "thesq", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 

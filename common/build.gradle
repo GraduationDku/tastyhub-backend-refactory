@@ -2,6 +2,7 @@ description = 'common'
 
 dependencies {
     // 버전은 최상위 build.gradle의 dependency-management 플러그인이 관리합니다.
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'

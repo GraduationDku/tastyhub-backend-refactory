@@ -170,10 +170,10 @@ public class RecipeServiceImpl implements RecipeService {
 
     private List<CookStep> makeCookStep(List<CookStepCreateRequest> cookSteps, List<MultipartFile> cookStepImgs) {
         ArrayList<String> urlList = new ArrayList<>(); // s3 로직 혹은 업로드 서버 설정 예정
-
         ArrayList<CookStep> cookStepList = new ArrayList<>();
         for (int i = 0; i < cookSteps.size(); i++) {
-            cookStepList.add(CookStep.makeCookStep(cookSteps.get(i), urlList.get(i)));
+            String url = (i<urlList.size())?urlList.get(i):"";
+            cookStepList.add(CookStep.makeCookStep(cookSteps.get(i), url));
         }
         return cookStepList;
     }

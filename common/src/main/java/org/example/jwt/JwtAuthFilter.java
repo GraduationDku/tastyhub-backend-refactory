@@ -2,6 +2,7 @@ package org.example.jwt;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -36,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (!Objects.equals(accessToken,"") && jwtUtils.isTokenValid(accessToken)) {
             Claims userInfoFromToken = jwtUtils.getUserInfoFromToken(accessToken);
             String username = userInfoFromToken.getSubject();
-            String role = userInfoFromToken.get("auth").toString();
+            String role = String.valueOf(userInfoFromToken.get("auth"));
             setAuthentication(username,role);
         }
         try {
@@ -44,32 +46,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         catch (Exception e) {
             log.error(e.getMessage());
         }
-//        } finally {
-//            MDC.remove("userId");
-//        }
     }
 
     public void setAuthentication(String username,String role) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication;
-        if(role.equals("Admin")){
-            authentication = this.createAdminAuthentication(username,role);
-        }else{
-            authentication = this.createAuthentication(username,role);
-        }
-//        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//        String usernameForMDC = userDetails.getUsername();
-//        MDC.put("userID", usernameForMDC);
+        Authentication authentication = createSafeAuthentication(username,role);
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
     }
 
-    public Authentication createAuthentication(String username, String role) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, role, userDetails.getAuthorities());
+    private Authentication createSafeAuthentication(String username,String role) {
+        try{
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            return new  UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        }catch (Exception e){
+            String authority = mapRoleToAuthority(role);
+            return new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(authority)));
+        }
     }
-    public Authentication createAdminAuthentication(String username, String role) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, role, userDetails.getAuthorities());
+
+    private  String mapRoleToAuthority(String role) {
+        if (role == null) {
+            return "COMMON";
+        }
+        return switch (role.toUpperCase()) {
+            case "ADMIN" -> "ADMIN";
+            default -> "COMMON";
+
+        };
     }
 }

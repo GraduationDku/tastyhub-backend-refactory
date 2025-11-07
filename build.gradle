@@ -51,7 +51,7 @@ configure(subprojects.findAll {
         annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
     }
 
-    def generated = 'src/main/generated'
+    def generated = "$buildDir/generated/sources/annotationProcessor/java/main"
 
     sourceSets {
         main.java.srcDirs += [ generated ]

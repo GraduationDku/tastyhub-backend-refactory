@@ -30,6 +30,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable());
+        http.cors(corsConfiguration -> corsConfiguration.disable());
+        http.formLogin(f -> f.disable());
+        http.httpBasic(h->h.disable());
         http.sessionManagement(sessionManagement ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth ->
@@ -41,7 +44,7 @@ public class SecurityConfig {
         );
         http
 //                .addFilterBefore(traceIdFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

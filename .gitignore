@@ -4,3 +4,11 @@ application.yaml
 *.p8
 *.html
 application.yml
+
+**/build/
+**/.gradle/
+.DS_Store
+**/out/
+**/bin/
+**/.idea/
+src/main/generated/

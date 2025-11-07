@@ -11,12 +11,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.example.headers.StatusResponse;
+
 import static org.example.headers.HttpResponseEntity.RESPONSE_OK;
 import static org.example.headers.HttpResponseEntity.INTERNAL_SERVER_ERROR;
 
@@ -69,25 +71,20 @@ public class UserController {
             // 3. 결과에 따른 응답 생성
             if (result) {
                 return ResponseEntity.ok()
-                        .body((StatusResponse) Map.of(
-                                "status", "success",
-                                "message", "회원탈퇴가 완료되었습니다"
-                        ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(new StatusResponse(200, "회원탈퇴가 완료되었습니다."));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body((StatusResponse) Map.of(
-                                "status", "error",
-                                "message", "회원탈퇴 처리 중 오류가 발생했습니다"
-                        ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body((new StatusResponse(400, "회원탈퇴 처리 . 오류가 발생했습니다.")));
             }
         } catch (Exception e) {
             // 기타 서버 오류
             log.error("회원탈퇴 처리 중 예상치 못한 오류: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body((StatusResponse) Map.of(
-                            "status", "error",
-                            "message", "서버 오류가 발생했습니다"
-                    ));
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new StatusResponse(500, "서버 오류가 발생했습니다."));
         }
 
     }
@@ -97,34 +94,29 @@ public class UserController {
         try {
             // 사용자 객체가 null인지 확인
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body((StatusResponse) Map.of(
-                        "status", "error",
-                        "message", "인증되지 않은 사용자입니다."
-                ));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(new StatusResponse(401, "인증되지 않은 사용자입니다."));
             }
 
             boolean result = userService.logout(user.getUser());
 
             // 성공/실패에 따른 응답 구분
             if (result) {
-                return ResponseEntity.ok().body((StatusResponse) Map.of(
-                        "status", "success",
-                        "message", "로그아웃 처리되었습니다."
-                ));
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(new StatusResponse(200, "로그아웃 처리 되었습니다.."));
             } else {
-                return ResponseEntity.ok().body((StatusResponse) Map.of(
-                        "status", "warning",
-                        "message", "이미 로그아웃 되었거나 세션이 만료되었습니다."
-                ));
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(new StatusResponse(200, "이미 로그아웃 되었거나 세션이 만료되었습니다."));
             }
         } catch (Exception e) {
             // 예외 발생 시 로그 기록 및 오류 응답
             log.error("로그아웃 처리 중 예외 발생: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body((StatusResponse) Map.of(
-                    "status", "error",
-                    "message", "서버 오류로 로그아웃 처리에 실패했습니다."
-            ));
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new StatusResponse(500, "서버 오류로 인해 로그아웃 처리에 실패했습니다."));
         }
     }
 
