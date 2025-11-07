@@ -30,7 +30,7 @@ public class JwtUtils {
     //Refresh
     public static final String REFRESH_HEADER = "Refresh";
     public static final String REFRESH_KEY = "refresh";
-    private static final long REFRESH_TOKEN_TIME = 7 * 60 * 60 * 1000L;
+    private static final long REFRESH_TOKEN_TIME = 7 * 24 * 60 * 60 * 1000L;
 
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -104,8 +104,8 @@ public class JwtUtils {
         try {
             parseClaims(token);
             return true;
-        }catch (Exception e){
-            log.info("Invaild Token: {}" ,e.getMessage());
+        } catch (Exception e) {
+            log.info("Invaild Token: {}", e.getMessage());
             return false;
         }
     }
