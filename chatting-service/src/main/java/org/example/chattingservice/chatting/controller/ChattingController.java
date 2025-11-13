@@ -25,7 +25,5 @@ public class ChattingController {
     public ChatDto sendMessage(@DestinationVariable Long roomId, @Payload ChatDto chatDto, @RequestHeader("Authorization") String authHeader) {
         String username = jwtUtils.extractUsername(authHeader);
         return chatService.sendMessage(roomId, chatDto, username);
-
-
     }
 }

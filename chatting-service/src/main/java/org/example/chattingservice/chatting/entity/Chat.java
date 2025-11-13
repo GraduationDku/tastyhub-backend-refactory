@@ -40,7 +40,7 @@ public class Chat extends TimeStamp {
         return Chat.builder()
                 .chatRoom(chatRoom)
                 .content(chatDto.getContent())
-                .senderNickname(chatDto.getSender())
+                .senderNickname(chatDto.getSenderNickname())
                 .senderUsername(senderUsername)
                 .build();
     }
