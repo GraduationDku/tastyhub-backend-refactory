@@ -12,4 +12,4 @@ application.yml
 **/bin/
 **/.idea/
 src/main/generated/
-common/build/
+./common/build/

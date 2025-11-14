@@ -4,6 +4,7 @@ package org.example.chattingservice.chatting.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.chattingservice.chatting.dtos.ChatDto;
 import org.example.chattingservice.chatting.dtos.ChatRoomCreateDto;
+import org.example.chattingservice.chatting.dtos.ChatRoomDto;
 import org.example.chattingservice.chatting.service.chatRoom.ChatRoomService;
 import org.example.headers.StatusResponse;
 import org.example.jwt.JwtUtils;
@@ -51,11 +52,11 @@ public class ChattingRoomController {
      * @return List<ChatRoomDto>
      */
     @GetMapping
-    public ResponseEntity<Page<ChatRoomCreateDto>> getChatRoomList(
+    public ResponseEntity<Page<ChatRoomDto>> getChatRoomList(
             @RequestHeader("Authorization") String authHeader,
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<ChatRoomCreateDto> chatRoomDtoList = null;
+        Page<ChatRoomDto> chatRoomDtoList = null;
         try {
             String username = jwtUtils.extractUsername(authHeader);
             chatRoomDtoList = chatRoomService.getChatRoomList(username, pageable);

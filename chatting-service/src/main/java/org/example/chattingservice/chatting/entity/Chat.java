@@ -36,11 +36,11 @@ public class Chat extends TimeStamp {
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
-    public static Chat createChat(ChatDto chatDto, ChatRoom chatRoom, String senderUsername) {
+    public static Chat createChat(ChatDto chatDto, ChatRoom chatRoom, String senderUsername, String senderNickname) {
         return Chat.builder()
                 .chatRoom(chatRoom)
                 .content(chatDto.getContent())
-                .senderNickname(chatDto.getSenderNickname())
+                .senderNickname(senderNickname)
                 .senderUsername(senderUsername)
                 .build();
     }

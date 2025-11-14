@@ -30,18 +30,31 @@ public class ChatRoom {
     private String chatRoomDescription;
 
     @Builder.Default
-    @OneToMany(mappedBy = "chatRoom",cascade = CascadeType.ALL)
-    private Set<ChatRoomMember> userNames = new HashSet<>();
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChatRoomMember> members = new HashSet<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private final List<Chat> chats = new ArrayList<>();
 
-    public void updateEnterUser(ChatRoomMember chatRoomMember) {
-        this.getUserNames().add(chatRoomMember);
+    public boolean hasMember(String username){
+        return members.stream().anyMatch(m -> m.getUsername().equals(username));
     }
 
-    public void updateDeleteUser(ChatRoomMember chatRoomMember) {
-        this.getUserNames().remove(chatRoomMember);
+    public ChatRoomMember addUser(String username,String nicknameSnapshot) {
+        if(hasMember(username)){
+            return null;
+        }
+        ChatRoomMember member = ChatRoomMember.builder()
+                .chatRoom(this)
+                .username(username)
+                .nicknameSnapshot(nicknameSnapshot)
+                .build();
+        members.add(member);
+        return member;
+    }
+
+    public void deleteUser(String username) {
+        members.removeIf(m-> m.getUsername().equals(username));
     }
 }

@@ -14,7 +14,8 @@ import org.example.timeStamp.TimeStamp;
 @NoArgsConstructor
 
 @Entity
-@Table
+@Table(name = "chat_room_members",
+       uniqueConstraints = @UniqueConstraint(name = "uk_room_username", columnNames = {"chat_room_id", "username"}))
 public class ChatRoomMember extends TimeStamp {
 
     @Id
@@ -28,7 +29,7 @@ public class ChatRoomMember extends TimeStamp {
     @Column(nullable = false, length = 100)
     private String username;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String nicknameSnapshot;
 
 
