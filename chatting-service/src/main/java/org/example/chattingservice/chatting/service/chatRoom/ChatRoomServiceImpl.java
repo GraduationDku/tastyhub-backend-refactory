@@ -11,6 +11,7 @@ import org.example.chattingservice.chatting.repository.chatRoom.ChatRoomReposito
 import org.example.chattingservice.chatting.repository.chat.ChatRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.example.chattingservice.chatting.repository.chatRoomMember.ChatRoomMemberRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,20 +55,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public Page<ChatRoomDto> getChatRoomList(String username, Pageable pageable) {
-        List<ChatRoom> userChatRooms = chatRoomRepository.findAllByMemberUsername(username);
-        List<ChatRoomDto> collect = userChatRooms.stream()
-                .map(r -> ChatRoomDto.builder()
-                        .roomId(r.getId())
-                        .roomName(r.getRoomName())
-                        .chatRoomDescription(r.getChatRoomDescription()).build())
-                .toList();
+        Page<ChatRoomDto> userChatRooms = chatRoomRepository.findAllByMemberUsername(username,pageable);
 
-        return convertListToPage(collect, pageable);
+
+        return userChatRooms;
     }
 
     @Override
     @Transactional
-    public List<ChatDto> getChatRoom(Long roomId, String username) {
+    public List<ChatDto> getChatContent(Long roomId, String username) {
         ChatRoom chatRoom = findChatRoomById(roomId);
         if(!chatRoomMemberRepository.existsByChatRoomAndUsername(chatRoom, username)){
             try{
@@ -114,29 +110,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
 
     }
-
-
-    // 기존 리스트를 페이지로 변환하는 메서드
-    public static <T> Page<T> convertListToPage(List<T> list, Pageable pageable) {
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), list.size());
-
-        // start가 리스트 크기를 초과하는 경우 빈 리스트 반환
-        if (start > list.size()) {
-            return new PageImpl<>(List.of(), pageable, list.size());
-        }
-
-        List<T> pageContent = list.subList(start, end);
-
-        return new PageImpl<>(pageContent, pageable, list.size());
-    }
-
-//    // 임의의 ChatRoomDto 리스트 생성 메서드
-//    private static List<ChatRoomDto> generateChatRoomList() {
-//        return IntStream.range(1, 51)
-//                .mapToObj(i -> new ChatRoomDto((long) i, "hatRoom " + i))
-//                .collect(Collectors.toList());
-//    }
 
     private ChatRoom findChatRoomById(Long roomId) {
         return chatRoomRepository.findById(roomId)

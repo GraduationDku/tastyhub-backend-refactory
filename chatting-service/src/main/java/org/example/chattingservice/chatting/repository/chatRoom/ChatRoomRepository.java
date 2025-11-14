@@ -1,6 +1,7 @@
 package org.example.chattingservice.chatting.repository.chatRoom;
 
 import jakarta.persistence.LockModeType;
+import org.example.chattingservice.chatting.dtos.ChatRoomDto;
 import org.example.chattingservice.chatting.entity.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -14,8 +15,8 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, ChatRoomRepositoryQuery {
 
-    @Query("select distinct c from ChatRoom c join c.members m where m.username = :username")
-    List<ChatRoom> findAllByMemberUsername(@Param("username") String username);
+//    @Query("select distinct c from ChatRoom c join c.members m where m.username = :username")
+//    List<ChatRoomDto> findAllByMemberUsername(@Param("username") String username);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from ChatRoom c where c.id = :id")

@@ -13,7 +13,7 @@ public interface ChatRoomService {
 
     Page<ChatRoomDto> getChatRoomList(String username, Pageable pageable);
 
-    List<ChatDto> getChatRoom(Long roomId, String username);
+    List<ChatDto> getChatContent(Long roomId, String username);
 
     void enterNewChatRoom(Long roomId, String username);
 

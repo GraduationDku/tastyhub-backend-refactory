@@ -64,7 +64,7 @@ public class ChattingRoomController {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok().body(chatRoomDtoList);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(chatRoomDtoList);
     }
 
     /***
@@ -80,7 +80,7 @@ public class ChattingRoomController {
         List<ChatDto> chatDtoList = null;
         try {
             String username = jwtUtils.extractUsername(authHeader);
-            chatDtoList = chatRoomService.getChatRoom(roomId, username);
+            chatDtoList = chatRoomService.getChatContent(roomId, username);
         } catch (Exception e) {
             e.printStackTrace();
         }
