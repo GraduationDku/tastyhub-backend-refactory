@@ -1,12 +1,24 @@
 version: '3.8'
 services:
+
+  redis:
+    image: redis:latest
+    container_name: redis-refresh
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-refresh:/data
+    command: redis-server --appendonly yes
+    restart: always
+
+
   mysql-user:
     image: mysql:8.0
     container_name: mysql-user
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: user_service_db
     volumes:
       - user-db:/var/lib/mysql
@@ -17,11 +29,24 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: recipe_service_db
     volumes:
       - recipe-db:/var/lib/mysql
 
+  mysql-chat:
+    image: mysql:8.0
+    container_name: mysql-chat
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: chat_service_db
+    volumes:
+      - chat-db:/var/lib/mysql
+
 volumes:
-  user-db:
-  recipe-db:
+  user-db: {}
+  recipe-db: {}
+  chat-db: {}
+  redis-refresh: {}
