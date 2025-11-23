@@ -22,7 +22,7 @@ import static org.example.headers.HttpResponseEntity.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/chat")
+@RequestMapping("/chatting")
 public class ChattingRoomController {
     private final ChatRoomService chatRoomService;
     private final JwtUtils jwtUtils;
