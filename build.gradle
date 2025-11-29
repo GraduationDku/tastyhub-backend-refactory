@@ -2,11 +2,10 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.5' apply false
     id 'io.spring.dependency-management' version '1.1.7' apply false
-
-//    id 'io.spring.dependency-management' version '1.1.7' apply( )
-
 }
-
+ext {
+    springCloudVersion = "2025.0.0"
+}
 subprojects {
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
@@ -44,7 +43,13 @@ subprojects {
 }
 
 
-configure(subprojects.findAll{it.name.endsWith('-service')}){
+configure(subprojects.findAll{
+    it.name.endsWith('-service')||it.name in['apiGateway-service', 'service-discovery']}){
+    dependencyManagement{
+        imports{
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
     dependencies {
         implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.3.0'
     }

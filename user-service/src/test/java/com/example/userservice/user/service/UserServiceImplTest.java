@@ -52,6 +52,7 @@ class UserServiceImplTest {
     void setUp() {
         testUser = User.builder()
                 .id(1L)
+                .userName("testuser")
                 .email("test@example.com")
                 .nickname("testuser")
                 .appleId("testAppleId")
@@ -110,7 +111,7 @@ class UserServiceImplTest {
     @DisplayName("액세스 토큰 재발급 - 성공")
     void refreshAccessToken_success() {
         given(userRepository.findByNickname("testuser")).willReturn(Optional.of(testUser));
-        given(jwtUtils.getRefreshToken(testUser.getUserName())).willReturn("valid_refresh_token");
+        given(jwtUtils.getRefreshToken(testUser.getNickname())).willReturn("valid_refresh_token");
         given(jwtUtils.isTokenValid("valid_refresh_token")).willReturn(true);
 
         given(jwtUtils.createAccessToken(testUser.getNickname(), testUser.getUserType().toString())).willReturn("new_access_token");
@@ -125,7 +126,7 @@ class UserServiceImplTest {
     @DisplayName("액세스 토큰 재발급 - 실패 (유효하지 않은 리프레시 토큰)")
     void refreshAccessToken_invalidToken() {
         given(userRepository.findByNickname("testuser")).willReturn(Optional.of(testUser));
-        given(jwtUtils.getRefreshToken(testUser.getUserName())).willReturn("invalid_refresh_token");
+        given(jwtUtils.getRefreshToken(testUser.getNickname())).willReturn("invalid_refresh_token");
         given(jwtUtils.isTokenValid("invalid_refresh_token")).willReturn(false);
 
         HttpServletResponse response = mock(HttpServletResponse.class);
