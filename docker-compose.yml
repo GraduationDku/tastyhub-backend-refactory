@@ -1,52 +1,131 @@
-version: '3.8'
+version: "3.8"
+
 services:
+  eureka:
+    build: ./service-discovery
+    container_name: service-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8761
+    networks: [backend]
+
+  gateway:
+    build: ./apiGateway-service
+    container_name: api-gateway
+    depends_on: [eureka]
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8000
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+    networks: [backend]
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on: [eureka, mysql-user, redis]
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/user_service_db?
+      - useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+    networks: [backend]
+
+  recipe-service:
+    build: ./recipe-service
+    container_name: recipe-service
+    depends_on: [eureka, mysql-recipe]
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-recipe:3306/recipe_service_db?
+      - useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+    networks: [backend]
+
+  chatting-service:
+    build: ./chatting-service
+    container_name: chatting-service
+    depends_on: [eureka, mysql-chat]
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-chat:3306/chat_service_db?
+      - useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+    networks: [backend]
 
   redis:
     image: redis:latest
-    container_name: redis-refresh
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
       - redis-refresh:/data
     command: redis-server --appendonly yes
     restart: always
-
+    networks: [backend]
 
   mysql-user:
     image: mysql:8.0
     container_name: mysql-user
-    ports:
-      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: user_service_db
+    ports:
+      - "3306:3306"
     volumes:
       - user-db:/var/lib/mysql
+    networks: [backend]
 
   mysql-recipe:
     image: mysql:8.0
     container_name: mysql-recipe
-    ports:
-      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: recipe_service_db
+    ports:
+      - "3307:3306"
     volumes:
       - recipe-db:/var/lib/mysql
+    networks: [backend]
 
   mysql-chat:
     image: mysql:8.0
     container_name: mysql-chat
-    ports:
-      - "3308:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: chat_service_db
+    ports:
+      - "3308:3306"
     volumes:
       - chat-db:/var/lib/mysql
+    networks: [backend]
 
 volumes:
   user-db: {}
   recipe-db: {}
   chat-db: {}
   redis-refresh: {}
+
+
+networks:
+  backend: {}
