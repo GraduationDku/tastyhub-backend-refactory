@@ -3,6 +3,7 @@ package com.example.userservice.user.service;
 import com.example.userservice.user.dtos.UserDto;
 import com.example.userservice.user.entity.User;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.dtos.UserDtoForNickname;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,11 +17,13 @@ public interface UserService {
 
     void updateUserInfoByUserUpdateRequest(String newNickname, MultipartFile img, User user);
 
-    void refreshAccessToken(String nickName, HttpServletResponse response);
+    void refreshAccessToken(String refreshToken, HttpServletResponse response);
 
     Page<UserDto> getUserList(String nickname, Pageable pageable);
 
     boolean delete(User user);
 
     boolean logout(User user);
+
+    UserDtoForNickname getUserNickname(String username);
 }

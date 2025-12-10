@@ -12,7 +12,9 @@ services:
     networks: [backend]
 
   gateway:
-    build: ./apiGateway-service
+    build:
+      context: .
+      dockerfile: apiGateway-service/Dockerfile
     container_name: api-gateway
     depends_on: [eureka]
     ports:
@@ -24,7 +26,9 @@ services:
     networks: [backend]
 
   user-service:
-    build: ./user-service
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
     container_name: user-service
     depends_on: [eureka, mysql-user, redis]
     ports:
@@ -33,8 +37,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_PORT=8080
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/user_service_db?
-      - useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/user_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_DATA_REDIS_HOST=redis
@@ -42,7 +45,9 @@ services:
     networks: [backend]
 
   recipe-service:
-    build: ./recipe-service
+    build:
+      context: .
+      dockerfile: recipe-service/Dockerfile
     container_name: recipe-service
     depends_on: [eureka, mysql-recipe]
     ports:
@@ -51,14 +56,15 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_PORT=8080
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-recipe:3306/recipe_service_db?
-      - useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-recipe:3306/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
     networks: [backend]
 
   chatting-service:
-    build: ./chatting-service
+    build:
+      context: .
+      dockerfile: chatting-service/Dockerfile
     container_name: chatting-service
     depends_on: [eureka, mysql-chat]
     ports:
@@ -67,8 +73,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_PORT=8080
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-chat:3306/chat_service_db?
-      - useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-chat:3306/chat_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
     networks: [backend]

@@ -42,6 +42,15 @@ eureka:
 jwt:
   secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='
 
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 2000
+        read-tineout: 5000
+        logger-level: basic
+
+
 ---
 # ===============================================
 # Docker Profile (Docker 환경용)

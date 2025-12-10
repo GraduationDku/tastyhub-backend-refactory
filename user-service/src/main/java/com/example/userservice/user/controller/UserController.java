@@ -3,9 +3,11 @@ package com.example.userservice.user.controller;
 import com.example.userservice.user.dtos.UserDto;
 import com.example.userservice.user.service.UserService;
 import com.example.userservice.utils.auth.userDetails.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dtos.UserDtoForNickname;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,8 +47,8 @@ public class UserController {
     @PostMapping("/refresh")
     @ResponseBody
     public ResponseEntity<StatusResponse> refreshAccessToken(
-            @RequestParam String nickName, HttpServletResponse response) {
-        userService.refreshAccessToken(nickName, response);
+            HttpServletRequest request, HttpServletResponse response) {
+        userService.refreshAccessToken(request.getHeader("Refresh"), response);
         return RESPONSE_OK;
     }
 
@@ -132,6 +134,11 @@ public class UserController {
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         userService.updateUserInfoByUserUpdateRequest(newNickname, img, userDetails.getUser());
         return RESPONSE_OK;
+    }
+
+    @GetMapping("/get-user-nickname")
+    public UserDtoForNickname getUserNickname(@RequestParam String username) {
+        return userService.getUserNickname(username);
     }
 
 

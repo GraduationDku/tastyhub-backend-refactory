@@ -6,6 +6,7 @@ import com.example.recipeservice.recipe.entity.FoodInformation;
 import com.example.recipeservice.recipe.entity.Ingredient;
 import com.example.recipeservice.recipe.entity.Recipe;
 import com.example.recipeservice.recipe.repository.recipe.RecipeRepository;
+import com.example.recipeservice.recipe.service.client.UserClient;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeRepository recipeRepository;
+    private final UserClient userClient;
 
     @Override
     public Page<PagingRecipeResponse> getPopularRecipes(Pageable pageable) {
@@ -77,10 +79,12 @@ public class RecipeServiceImpl implements RecipeService {
         List<Ingredient> ingredients = createIngredients(recipeCreateDto.getIngredients());
         List<CookStep> cookSteps = makeCookStep(recipeCreateDto.getCookSteps(), cookStepImgs);
 
+        String userNickname = userClient.getUserNickName(username).getNickname();
+
         try {
             // imgUrl = s3Uploader.upload(recipeImg, "image/recipeImg");
 
-            Recipe recipe = Recipe.createRecipe(recipeCreateDto, username, imgUrl, foodInformation,
+            Recipe recipe = Recipe.createRecipe(recipeCreateDto, userNickname, imgUrl, foodInformation,
                     ingredients,
                     cookSteps);
 
