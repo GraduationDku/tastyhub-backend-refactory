@@ -9,6 +9,7 @@ import org.example.chattingservice.chatting.entity.ChatRoom;
 import org.example.chattingservice.chatting.entity.ChatRoomMember;
 import org.example.chattingservice.chatting.repository.chatRoom.ChatRoomRepository;
 import org.example.chattingservice.chatting.repository.chat.ChatRepository;
+import org.example.chattingservice.chatting.service.client.UserClient;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.example.chattingservice.chatting.repository.chatRoomMember.ChatRoomMemberRepository;
 
@@ -31,6 +32,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final UserClient userClient;
 
     @Override
     @Transactional
@@ -55,6 +57,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public Page<ChatRoomDto> getChatRoomList(String username, Pageable pageable) {
+
+        String nickname = userClient.getUserNickName(username).getNickname();
         Page<ChatRoomDto> userChatRooms = chatRoomRepository.findAllByMemberUsername(username,pageable);
 
 
