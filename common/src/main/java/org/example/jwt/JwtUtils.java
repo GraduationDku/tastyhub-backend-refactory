@@ -121,7 +121,7 @@ public class JwtUtils {
             // 2. 토큰 자체 검증
             Claims claims = parseClaims(token);
             String tokenType = claims.get("type", String.class);
-            return REFRESH_HEADER.equals(tokenType);
+            return REFRESH_KEY.equals(tokenType);
         } catch (Exception e) {
             log.info("Invalid refresh token: {}", e.getMessage());
             return false;
