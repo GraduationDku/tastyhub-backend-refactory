@@ -1,8 +1,11 @@
 package com.example.recipeservice.config;
 
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.support.CompositeCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -16,14 +19,29 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
-public class RedisCacheConfig {
+public class CacheConfig {
+
+    @Bean
+    public Caffeine<Object, Object> caffeineSpec() {
+        return Caffeine.newBuilder()
+                .maximumSize(1000)
+                .expireAfterWrite(Duration.ofMinutes(5))
+                .recordStats();
+    }
+
+    @Bean
+    public CacheManager caffeineCacheManager(Caffeine<Object, Object> caffeineSpec) {
+        CaffeineCacheManager mgr = new CaffeineCacheManager("popularRecipes","recipeDetail");
+        mgr.setCaffeine(caffeineSpec);
+        return mgr;
+    }
 
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    public CacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
 
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60)) // 기본 캐시 유효 시간 (예: 60분)
+                .entryTtl(Duration.ofMinutes(30)) // 기본 캐시 유효 시간 (예: 30분)
                 .disableCachingNullValues()       // null 값은 캐싱하지 않음
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())) // Key 직렬화 (String)
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())); // Value 직렬화 (JSON)
@@ -34,4 +52,12 @@ public class RedisCacheConfig {
                 .build();
 
     }
+
+    @Bean
+    public CacheManager cacheManager(CacheManager caffeineCacheManager, CacheManager redisCacheManager) {
+        CompositeCacheManager compositeCacheManager = new CompositeCacheManager(caffeineCacheManager, redisCacheManager);
+        compositeCacheManager.setFallbackToNoOpCache(false);
+        return compositeCacheManager;
+    }
+
 }

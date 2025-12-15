@@ -55,6 +55,16 @@ feign:
         logger-level: basic
 
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      recipeCache:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+
 ---
 # ===============================================
 # Docker Profile (Docker 환경용)
