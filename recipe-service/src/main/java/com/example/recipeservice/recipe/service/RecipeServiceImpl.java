@@ -10,6 +10,8 @@ import com.example.recipeservice.recipe.service.client.UserClient;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,10 @@ public class RecipeServiceImpl implements RecipeService {
     private final UserClient userClient;
 
     @Override
+    @Cacheable(value="popularRecipes",
+            key="'p'+#pageable.pageNumber+'_s'+#pageable.pageSize+'_sort'+#pageable.sort.toString()",
+            condition="#pageable.pageNumber < 5",
+            sync=true)
     public Page<PagingRecipeResponse> getPopularRecipes(Pageable pageable) {
         return recipeRepository.getPopularRecipes(pageable);
     }
@@ -101,6 +107,8 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "popularRecipes", allEntries = true)               //
+
     public void updateRecipe(Long recipeId, MultipartFile img, String username,
                              RecipeUpdateDto recipeUpdateDto) throws AccessDeniedException {
         // 1. 레시피 조회 및 수정 권한 확인
@@ -148,6 +156,8 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = "popularRecipes", allEntries = true)               //
     public void deleteRecipe(Long recipeId, String username) throws AccessDeniedException {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe not found"));
         if (recipe.getUsername().equals(username)) {
