@@ -28,9 +28,27 @@ spring:
         format_sql: true
         show_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-
-
     defer-datasource-initialization: true
+  kafka:
+    bootstrap-servers: localhost:29092
+    listener:
+      ack-mode: manual_immediate
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      group-id: user-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted.packages: org.example.events.userdeletion
+        key-serializer:
+          org.apache.kafka.common.serialization.StringSerializer
+        value-serializer:
+          org.springframework.kafka.support.serializer.JsonSerializer
 
 eureka:
   client:
@@ -70,6 +88,8 @@ spring:
   config:
     activate:
       on-profile: docker
+  kafka:
+    bootstrap-servers: kafka:9092
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://mysql-user:3306/user_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8

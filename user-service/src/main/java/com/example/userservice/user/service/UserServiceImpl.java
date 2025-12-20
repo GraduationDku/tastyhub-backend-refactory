@@ -136,5 +136,9 @@ public class UserServiceImpl implements UserService {
         return new UserDtoForNickname(user.getNickname());
     }
 
+//    public void onStepResult(UserDeletionStepResultEvent event, Acknowledgment acknowledgment) {
+//
+//    }
+
 }
 
