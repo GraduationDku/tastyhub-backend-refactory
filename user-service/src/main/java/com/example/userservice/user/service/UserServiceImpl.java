@@ -1,5 +1,6 @@
 package com.example.userservice.user.service;
 
+import com.example.userservice.saga.userDeletion.UserDeletionSagaService;
 import com.example.userservice.user.dtos.UserDto;
 import com.example.userservice.user.entity.User;
 import com.example.userservice.user.repository.UserRepository;
@@ -30,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private final JwtUtils jwtUtils;
     // s3용 이미지 저장 추가
     private final AppleAuthService appleAuthService;
-
+    private final UserDeletionSagaService userDeletionSagaService;
 
     @Override
     public boolean checkDuplicatedNickname(String nickname) {
@@ -87,7 +88,8 @@ public class UserServiceImpl implements UserService {
     public void updateUserInfoByUserUpdateRequest(String newNickname, MultipartFile img, User user) {
         if (userRepository.existsByNickname(newNickname)) {
             throw new UsernameNotFoundException("Duplicated Nickname");
-        };
+        }
+        ;
         String imgUrl = ""; // 로컬 이미지 처리기 추가
         user.updateUserInfo(newNickname, imgUrl);
     }
@@ -101,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
         if (jwtUtils.isRefreshTokenValid(user.getNickname(), refreshToken)) {
             String newAccess = jwtUtils.createAccessToken(user.getUserName(), user.getUserType().toString());
-            response.setHeader("Authorization",newAccess );
+            response.setHeader("Authorization", newAccess);
         } else {
             throw new UsernameNotFoundException("Invalid refresh token");
         }
@@ -109,7 +111,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDto> getUserList(String nickname, Pageable pageable) {
-        return userRepository.findAllByNickname(nickname,pageable);
+        return userRepository.findAllByNickname(nickname, pageable);
     }
 
     @Override

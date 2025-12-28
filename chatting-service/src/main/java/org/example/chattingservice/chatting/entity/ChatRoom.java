@@ -37,9 +37,11 @@ public class ChatRoom {
     @Builder.Default
     private final List<Chat> chats = new ArrayList<>();
 
-    public boolean hasMember(String username){
-        return members.stream().anyMatch(m -> m.getUsername().equals(username));
+    public boolean hasMember(String username) {
+        return members.stream()
+                .anyMatch(m -> m.getUsername().equals(username) && !m.isDeleted());
     }
+
 
     public ChatRoomMember addUser(String username,String nicknameSnapshot) {
         if(hasMember(username)){
@@ -49,12 +51,13 @@ public class ChatRoom {
                 .chatRoom(this)
                 .username(username)
                 .nicknameSnapshot(nicknameSnapshot)
+                .deleted(false)
                 .build();
         members.add(member);
         return member;
     }
 
     public void deleteUser(String username) {
-        members.removeIf(m-> m.getUsername().equals(username));
+        members.removeIf(m-> m.getUsername().equals(username)&&!m.isDeleted());
     }
 }

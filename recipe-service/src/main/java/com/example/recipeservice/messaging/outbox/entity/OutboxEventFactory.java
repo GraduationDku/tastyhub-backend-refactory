@@ -1,6 +1,5 @@
 package com.example.recipeservice.messaging.outbox.entity;
 
-import com.example.userservice.messaging.outbox.entity.OutboxEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

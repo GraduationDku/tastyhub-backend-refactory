@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -90,7 +91,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void enterNewChatRoom(Long roomId, String username) {
         ChatRoom chatRoom = findChatRoomById(roomId);
         // user service 호출 부분, username을 기반으로 nickname 호출
-        String nickname="";
+        Optional<ChatRoomMember> byChatRoomAndUsername = chatRoomMemberRepository.findByChatRoomAndUsername(chatRoom, username);
+        if(byChatRoomAndUsername.isPresent()){
+            ChatRoomMember chatRoomMember = byChatRoomAndUsername.get();
+            if (chatRoomMember.isDeleted()) {
+                chatRoomMember.sofDeletedRollBack();
+            }
+            return;
+        }
+
         chatRoom.addUser(username, username);
     }
 
@@ -109,7 +118,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void deleteChatRoom(Long roomId, String username) {
 
         ChatRoom chatRoom = findChatRoomById(roomId);
-        if (chatRoom.getMembers().size() == 1 ) {
+        long activeMemberCount = chatRoom.getMembers().stream()
+                .filter(member -> !member.isDeleted())
+                .count();
+        if (activeMemberCount == 1) {
             chatRoomRepository.delete(chatRoom);
         }
 

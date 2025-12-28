@@ -1,4 +1,4 @@
-package com.example.userservice.saga;
+package com.example.userservice.saga.userDeletion;
 
 public enum UserDeletionSagaStatus {
 

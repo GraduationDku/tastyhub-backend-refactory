@@ -34,21 +34,14 @@ spring:
     listener:
       ack-mode: manual_immediate
     producer:
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
       group-id: user-service
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring:
-          json:
-            trusted.packages: org.example.events.userdeletion
-        key-serializer:
-          org.apache.kafka.common.serialization.StringSerializer
-        value-serializer:
-          org.springframework.kafka.support.serializer.JsonSerializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 
 eureka:
   client:

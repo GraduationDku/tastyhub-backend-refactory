@@ -48,6 +48,8 @@ public class User  extends TimeStamp {
         ADMIN, COMMON
     }
 
+    private boolean deleted;
+
     @Embedded
     private Village village;
 
@@ -66,6 +68,7 @@ public class User  extends TimeStamp {
                 .nickname(nickname)
                 .village(village)
                 .userType(userType)
+                .deleted(false)
                 .build();
     }
 
@@ -76,12 +79,22 @@ public class User  extends TimeStamp {
                 .appleId(appleId)
                 .nickname(nickname)
                 .userType(UserType.COMMON)
+                .deleted(false)
                 .build();
     }
 
     public void updateUserInfo(String newNickName, String imgUrl) {
         this.nickname = newNickName;
         this.userImg = imgUrl;
+    }
+
+    public void softDelete() {
+        this.deleted = true;
+    }
+    public void restoreDeleted() {
+        if(this.deleted) {
+            this.deleted = false;
+        }
     }
 
     public void updateVillage(Village village) {

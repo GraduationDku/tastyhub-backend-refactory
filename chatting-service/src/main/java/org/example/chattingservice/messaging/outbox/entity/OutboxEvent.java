@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -51,17 +52,39 @@ public class OutboxEvent {
     @Column(name = "retry_count", nullable = false)
     private Integer retryCount;
 
+    @Column(name = "next_attempt_at", nullable = false)
+    private Instant nextAttemptAt;
+
+    @Column(name = "max_retry", nullable = false)
+    private Integer maxRetry;
+
+
+
     @PrePersist
     void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID();
-        }
-        if (status == null) {
-            status = OutboxStatus.PENDING;
-        }
-        if(createdAt == null) {
-            createdAt = Instant.now();
-        }
+        if (id == null) id = UUID.randomUUID();
+        if (status == null) status = OutboxStatus.PENDING;
+        if (createdAt == null) createdAt = Instant.now();
+        if (lastTriedAt == null) lastTriedAt = createdAt;
+        if (retryCount == null) retryCount = 0;
+        if (nextAttemptAt == null) nextAttemptAt = createdAt;
+        if (maxRetry == null) maxRetry = 10;
+    }
+
+    public boolean canRetry() {
+        return retryCount < maxRetry;
+    }
+
+    public void markRetry(Duration backoff) {
+        retryCount += 1;
+        lastTriedAt = Instant.now();
+        nextAttemptAt = lastTriedAt.plus(backoff);
+        status = OutboxStatus.FAILED;
+    }
+
+    public void markDead() {
+        lastTriedAt = Instant.now();
+        status = OutboxStatus.DEAD;
     }
 
     public void markSent() {
@@ -70,9 +93,11 @@ public class OutboxEvent {
     }
 
     public void markFailed() {
-        this.retryCount += 1;
-        this.lastTriedAt = Instant.now();
-        this.status = OutboxStatus.FAILED;
+        if (retryCount == null) retryCount = 0;
+        retryCount += 1;
+        lastTriedAt = Instant.now();
+        status = OutboxStatus.FAILED;
+
     }
 
 }
