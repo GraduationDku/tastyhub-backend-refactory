@@ -1,11 +1,17 @@
 package com.example.userservice.user.controller;
 
+import com.example.userservice.saga.UserDeletionSagaStatusResponse;
+import com.example.userservice.saga.userDeletion.UserDeletionSaga;
+import com.example.userservice.saga.userDeletion.UserDeletionSagaRepository;
+import com.example.userservice.saga.userDeletion.UserDeletionSagaService;
 import com.example.userservice.user.dtos.UserDto;
 import com.example.userservice.user.service.UserService;
 import com.example.userservice.utils.auth.userDetails.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dtos.UserDtoForNickname;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,13 +30,17 @@ import static org.example.headers.HttpResponseEntity.INTERNAL_SERVER_ERROR;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserDeletionSagaService userDeletionSagaService;
+    private final UserDeletionSagaRepository sagaRepository;
 
     // 프론트엔드에서 authorization_code를 받아오는 API
     @PostMapping("/login/oauth2/code/apple")
@@ -44,8 +54,8 @@ public class UserController {
     @PostMapping("/refresh")
     @ResponseBody
     public ResponseEntity<StatusResponse> refreshAccessToken(
-            @RequestParam String nickName, HttpServletResponse response) {
-        userService.refreshAccessToken(nickName, response);
+            HttpServletRequest request, HttpServletResponse response) {
+        userService.refreshAccessToken(request.getHeader("Refresh"), response);
         return RESPONSE_OK;
     }
 
@@ -63,31 +73,23 @@ public class UserController {
         return ResponseEntity.ok().body(userDtoList);
     }
 
+
     @DeleteMapping("/delete")
-    public ResponseEntity<StatusResponse> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        try {
-            boolean result = userService.delete(userDetails.getUser());
-
-            // 3. 결과에 따른 응답 생성
-            if (result) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(new StatusResponse(200, "회원탈퇴가 완료되었습니다."));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body((new StatusResponse(400, "회원탈퇴 처리 . 오류가 발생했습니다.")));
-            }
-        } catch (Exception e) {
-            // 기타 서버 오류
-            log.error("회원탈퇴 처리 중 예상치 못한 오류: {}", e.getMessage(), e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new StatusResponse(500, "서버 오류가 발생했습니다."));
-        }
-
+    public ResponseEntity<StatusResponse> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userDeletionSagaService.start(userDetails.getUser().getUserName());
+        return ResponseEntity.accepted()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new StatusResponse(202, "회원탈퇴 요청이 접수되었습니다."));
     }
+
+    @GetMapping("/delete/status/{sagaId}")
+    public ResponseEntity<UserDeletionSagaStatusResponse> status(@PathVariable UUID sagaId) {
+        UserDeletionSaga saga = sagaRepository.findById(sagaId)
+                .orElseThrow(() -> new IllegalArgumentException("Saga not found: " + sagaId));
+        return ResponseEntity.ok(new UserDeletionSagaStatusResponse(
+                saga.getSagaId(), saga.getUsername(), saga.getStatus()));
+    }
+
 
     @PostMapping("/user/logout")
     public ResponseEntity<StatusResponse> logout(@AuthenticationPrincipal UserDetailsImpl user) {
@@ -131,6 +133,11 @@ public class UserController {
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         userService.updateUserInfoByUserUpdateRequest(newNickname, img, userDetails.getUser());
         return RESPONSE_OK;
+    }
+
+    @GetMapping("/get-user-nickname")
+    public UserDtoForNickname getUserNickname(@RequestParam String username) {
+        return userService.getUserNickname(username);
     }
 
 

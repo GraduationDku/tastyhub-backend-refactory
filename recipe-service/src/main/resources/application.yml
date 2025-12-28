@@ -2,26 +2,83 @@
 # Default Profile (기본 프로필)
 # ===============================================
 # Please update the username and password for your environment.
+
+server:
+  port: 0
+
 spring:
+  application:
+    name: recipe-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3307/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
-    password: your_password
+    password: 1234
+  data:
+    redis:
+      host: localhost
+      port: 6380
   jpa:
     hibernate:
       ddl-auto: update
+      dialect:
     properties:
       hibernate:
         format_sql: true
         show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
     defer-datasource-initialization: true
   sql:
     init:
       mode: always
 
+  kafka:
+    bootstrap-servers: localhost:29092
+    listener:
+      ack-mode: manual_immediate
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: recipe-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+
 jwt:
   secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='
+
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 2000
+        read-timeout: 5000
+        logger-level: basic
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      recipeCache:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
 
 ---
 # ===============================================
@@ -31,14 +88,19 @@ spring:
   config:
     activate:
       on-profile: docker
+  kafka:
+    bootstrap-servers: kafka:9092
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://recipe-mysql:3306/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://mysql-recipe:3306/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
-    password: your_password
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.MySQLDialect
+
 
 jwt:
   secret-key: 'wj/F9MSWipKOgL6fkdRRI4sExXsds7WY0lSneex16JQ='

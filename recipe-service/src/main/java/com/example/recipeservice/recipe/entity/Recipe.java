@@ -31,6 +31,7 @@ public class Recipe {
                 .cookSteps(cookSteps)
                 .foodName(recipeCreateDto.getFoodName())
                 .recipeType(recipeCreateDto.getRecipeType())
+                .deleted(false)
                 .build();
     }
 
@@ -40,6 +41,15 @@ public class Recipe {
         this.cookSteps = newCookSteps;
         this.foodName = foodName;
         this.recipeImgUrl = newImgUrl;
+    }
+
+    public void softDelete() {
+        this.deleted = true;
+    }
+    public void softDeleteRollBack() {
+        if (this.deleted) {
+            this.deleted = false;
+        }
     }
 
     public enum RecipeType {
@@ -57,6 +67,7 @@ public class Recipe {
 
     private String foodName;
 
+    private boolean deleted;
 
     @Column(name = "food_img", length = 1024)
     private String recipeImgUrl;

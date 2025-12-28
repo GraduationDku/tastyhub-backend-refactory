@@ -23,7 +23,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain springSecurityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http.cors(cors -> cors.disable());
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -21,4 +21,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, ChatR
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from ChatRoom c where c.id = :id")
     Optional<ChatRoom> lockById(@Param("id") Long id);
+
+    List<ChatRoom> findByUsername(String username);
 }

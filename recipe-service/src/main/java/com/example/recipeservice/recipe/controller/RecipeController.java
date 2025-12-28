@@ -27,7 +27,7 @@ import static org.example.headers.HttpResponseEntity.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/recipe")
+@RequestMapping("/recipes")
 public class RecipeController {
 
     private static final Logger log = LoggerFactory.getLogger(RecipeController.class);
@@ -38,7 +38,7 @@ public class RecipeController {
     private final SetHttpHeaders setHttpHeaders;
 
     @GetMapping("/popular")
-    public ResponseEntity<Page<PagingRecipeResponse>> getPopuralRecipes(
+    public ResponseEntity<Page<PagingRecipeResponse>> getPopularRecipes(
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok().headers(setHttpHeaders.setHeadersTypeJson())
                 .body(recipeService.getPopularRecipes(pageable));

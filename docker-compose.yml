@@ -1,27 +1,180 @@
-version: '3.8'
+version: "3.8"
+
 services:
+  eureka:
+    build: ./service-discovery
+    container_name: service-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8761
+    networks: [ backend ]
+
+  gateway:
+    build:
+      context: .
+      dockerfile: apiGateway-service/Dockerfile
+    container_name: api-gateway
+    depends_on: [ eureka ]
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8000
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+    networks: [ backend ]
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: user-service
+    depends_on: [ eureka, mysql-user, redis ]
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/user_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATA_REDIS_HOST=redis-refresh
+      - SPRING_DATA_REDIS_PORT=6379
+    networks: [ backend ]
+
+  recipe-service:
+    build:
+      context: .
+      dockerfile: recipe-service/Dockerfile
+    container_name: recipe-service
+    depends_on: [ eureka, mysql-recipe ]
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-recipe:3306/recipe_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATA_REDIS_HOST=redis-recipe-cache
+      - SPRING_DATA_REDIS_PORT=6380
+    networks: [ backend ]
+
+  chatting-service:
+    build:
+      context: .
+      dockerfile: chatting-service/Dockerfile
+    container_name: chatting-service
+    depends_on: [ eureka, mysql-chat ]
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-chat:3306/chat_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+    networks: [ backend ]
+
+  redis-refresh:
+    image: redis:latest
+    container_name: redis-refresh
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-refresh:/data
+    command: redis-server --appendonly yes
+    restart: always
+    networks: [ backend ]
+
+  redis-recipe-cache:
+    image: redis:latest
+    container_name: redis-recipe-cache
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-recipe-cache:/data
+    command: redis-server --appendonly yes
+    restart: always
+    networks: [ backend ]
+
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    ports:
+      - "29092:29092"
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller, broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://9093,PLAINTEXT_HOST://:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT, PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks: [ backend ]
+
+  kafka-uri:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8089:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on: [ kafka ]
+    networks: [ backend ]
+
   mysql-user:
     image: mysql:8.0
     container_name: mysql-user
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: user_service_db
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: your_password
-      MYSQL_DATABASE: user_service_db
     volumes:
       - user-db:/var/lib/mysql
+    networks: [ backend ]
 
   mysql-recipe:
     image: mysql:8.0
     container_name: mysql-recipe
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: recipe_service_db
     ports:
       - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: your_password
-      MYSQL_DATABASE: recipe_service_db
     volumes:
       - recipe-db:/var/lib/mysql
+    networks: [ backend ]
+
+  mysql-chat:
+    image: mysql:8.0
+    container_name: mysql-chat
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: chat_service_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - chat-db:/var/lib/mysql
+    networks: [ backend ]
 
 volumes:
-  user-db:
-  recipe-db:
+  user-db: { }
+  recipe-db: { }
+  chat-db: { }
+  redis-refresh: { }
+  redis-recipe-cache: { }
+
+
+networks:
+  backend: { }

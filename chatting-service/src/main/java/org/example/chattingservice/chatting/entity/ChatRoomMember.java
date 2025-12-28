@@ -32,6 +32,16 @@ public class ChatRoomMember extends TimeStamp {
     @Column(nullable = true, length = 100)
     private String nicknameSnapshot;
 
+    private boolean deleted = false;
+
+    public void softDeleted() {
+        this.deleted = true;
+    }
+    public void sofDeletedRollBack() {
+        if(this.deleted){
+            this.deleted = false;
+        }
+    }
 
 
 

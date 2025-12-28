@@ -1,5 +1,6 @@
 package com.example.userservice.user.service;
 
+import com.example.userservice.saga.userDeletion.UserDeletionSagaService;
 import com.example.userservice.user.dtos.UserDto;
 import com.example.userservice.user.entity.User;
 import com.example.userservice.user.repository.UserRepository;
@@ -10,6 +11,7 @@ import com.example.userservice.utils.nickName.NicknameGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dtos.UserDtoForNickname;
 import org.example.jwt.JwtUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private final JwtUtils jwtUtils;
     // s3용 이미지 저장 추가
     private final AppleAuthService appleAuthService;
-
+    private final UserDeletionSagaService userDeletionSagaService;
 
     @Override
     public boolean checkDuplicatedNickname(String nickname) {
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 5. 우리 서비스의 JWT 생성 및 응답 헤더에 추가
-        String accessToken = jwtUtils.createAccessToken(user.getNickname(), user.getUserType().toString());
+        String accessToken = jwtUtils.createAccessToken(user.getUserName(), user.getUserType().toString());
         jwtUtils.createRefreshToken(user.getNickname(), String.valueOf(user.getUserType()));
         response.addHeader("Authorization", accessToken);
 
@@ -86,19 +88,22 @@ public class UserServiceImpl implements UserService {
     public void updateUserInfoByUserUpdateRequest(String newNickname, MultipartFile img, User user) {
         if (userRepository.existsByNickname(newNickname)) {
             throw new UsernameNotFoundException("Duplicated Nickname");
-        };
+        }
+        ;
         String imgUrl = ""; // 로컬 이미지 처리기 추가
         user.updateUserInfo(newNickname, imgUrl);
     }
 
     @Override
-    public void refreshAccessToken(String nickName, HttpServletResponse response) {
-        User user = userRepository.findByNickname(nickName).orElseThrow(() -> new UsernameNotFoundException("Nickname not found"));
+    public void refreshAccessToken(String refreshToken, HttpServletResponse response) {
 
-        String refreshToken = jwtUtils.getRefreshToken(user.getNickname());
-        if (jwtUtils.isTokenValid(refreshToken)) {
-            String newAccess = jwtUtils.createAccessToken(user.getNickname(), user.getUserType().toString());
-            response.setHeader("Authorization",newAccess );
+        String nickname = jwtUtils.extractUsername(refreshToken);
+
+        User user = userRepository.findByNickname(nickname).orElseThrow(() -> new UsernameNotFoundException("Nickname not found"));
+
+        if (jwtUtils.isRefreshTokenValid(user.getNickname(), refreshToken)) {
+            String newAccess = jwtUtils.createAccessToken(user.getUserName(), user.getUserType().toString());
+            response.setHeader("Authorization", newAccess);
         } else {
             throw new UsernameNotFoundException("Invalid refresh token");
         }
@@ -106,7 +111,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDto> getUserList(String nickname, Pageable pageable) {
-        return userRepository.findAllByNickname(nickname,pageable);
+        return userRepository.findAllByNickname(nickname, pageable);
     }
 
     @Override
@@ -126,6 +131,16 @@ public class UserServiceImpl implements UserService {
     public boolean logout(User user) {
         return jwtUtils.deleteRefreshToken(user.getUserName());
     }
+
+    @Override
+    public UserDtoForNickname getUserNickname(String username) {
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        return new UserDtoForNickname(user.getNickname());
+    }
+
+//    public void onStepResult(UserDeletionStepResultEvent event, Acknowledgment acknowledgment) {
+//
+//    }
 
 }
 

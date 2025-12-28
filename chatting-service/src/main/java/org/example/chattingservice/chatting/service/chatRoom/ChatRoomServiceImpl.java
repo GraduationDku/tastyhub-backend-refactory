@@ -9,6 +9,7 @@ import org.example.chattingservice.chatting.entity.ChatRoom;
 import org.example.chattingservice.chatting.entity.ChatRoomMember;
 import org.example.chattingservice.chatting.repository.chatRoom.ChatRoomRepository;
 import org.example.chattingservice.chatting.repository.chat.ChatRepository;
+import org.example.chattingservice.chatting.service.client.UserClient;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.example.chattingservice.chatting.repository.chatRoomMember.ChatRoomMemberRepository;
 
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,6 +33,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final UserClient userClient;
 
     @Override
     @Transactional
@@ -55,6 +58,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public Page<ChatRoomDto> getChatRoomList(String username, Pageable pageable) {
+
+        String nickname = userClient.getUserNickName(username).getNickname();
         Page<ChatRoomDto> userChatRooms = chatRoomRepository.findAllByMemberUsername(username,pageable);
 
 
@@ -86,7 +91,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void enterNewChatRoom(Long roomId, String username) {
         ChatRoom chatRoom = findChatRoomById(roomId);
         // user service 호출 부분, username을 기반으로 nickname 호출
-        String nickname="";
+        Optional<ChatRoomMember> byChatRoomAndUsername = chatRoomMemberRepository.findByChatRoomAndUsername(chatRoom, username);
+        if(byChatRoomAndUsername.isPresent()){
+            ChatRoomMember chatRoomMember = byChatRoomAndUsername.get();
+            if (chatRoomMember.isDeleted()) {
+                chatRoomMember.sofDeletedRollBack();
+            }
+            return;
+        }
+
         chatRoom.addUser(username, username);
     }
 
@@ -105,7 +118,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void deleteChatRoom(Long roomId, String username) {
 
         ChatRoom chatRoom = findChatRoomById(roomId);
-        if (chatRoom.getMembers().size() == 1 ) {
+        long activeMemberCount = chatRoom.getMembers().stream()
+                .filter(member -> !member.isDeleted())
+                .count();
+        if (activeMemberCount == 1) {
             chatRoomRepository.delete(chatRoom);
         }
 

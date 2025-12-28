@@ -6,16 +6,23 @@ import com.example.recipeservice.recipe.entity.FoodInformation;
 import com.example.recipeservice.recipe.entity.Ingredient;
 import com.example.recipeservice.recipe.entity.Recipe;
 import com.example.recipeservice.recipe.repository.recipe.RecipeRepository;
+import com.example.recipeservice.recipe.service.client.UserClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
 import org.springframework.security.access.AccessDeniedException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +32,14 @@ import java.util.stream.Collectors;
 public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeRepository recipeRepository;
+    private final UserClient userClient;
 
     @Override
+    @CircuitBreaker(name = "recipeCache", fallbackMethod = "fallbackPopularRecipes")
+    @Cacheable(value = "popularRecipes",
+            key = "'p'+#pageable.pageNumber+'_s'+#pageable.pageSize+'_sort'+#pageable.sort.toString()",
+            condition = "#pageable.pageNumber < 5",
+            sync = true)
     public Page<PagingRecipeResponse> getPopularRecipes(Pageable pageable) {
         return recipeRepository.getPopularRecipes(pageable);
     }
@@ -42,12 +55,15 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @CircuitBreaker(name = "recipeCache", fallbackMethod = "fallbackGetRecipe")
+    @Cacheable(value = "recipeDetail",
+            key = "'rid'+#recipeId")
     public RecipeDto getRecipe(Long recipeId) {
 
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(EntityNotFoundException::new);
         FoodInformationDto foodInformationDto = recipe.getFoodInformation().makeFoodInformationDto();
-        List<IngredientDto> ingredients = recipe.getIngredients().stream().map(Ingredient :: makeIngredientDto).toList();
-        List<CookStepDto> cookStepDtos = recipe.getCookSteps().stream().map(CookStep :: makeCookStepDto).toList();
+        List<IngredientDto> ingredients = recipe.getIngredients().stream().map(Ingredient::makeIngredientDto).toList();
+        List<CookStepDto> cookStepDtos = recipe.getCookSteps().stream().map(CookStep::makeCookStepDto).toList();
 
 
         return RecipeDto.builder()
@@ -77,10 +93,12 @@ public class RecipeServiceImpl implements RecipeService {
         List<Ingredient> ingredients = createIngredients(recipeCreateDto.getIngredients());
         List<CookStep> cookSteps = makeCookStep(recipeCreateDto.getCookSteps(), cookStepImgs);
 
+        String userNickname = userClient.getUserNickName(username).getNickname();
+
         try {
             // imgUrl = s3Uploader.upload(recipeImg, "image/recipeImg");
 
-            Recipe recipe = Recipe.createRecipe(recipeCreateDto, username, imgUrl, foodInformation,
+            Recipe recipe = Recipe.createRecipe(recipeCreateDto, userNickname, imgUrl, foodInformation,
                     ingredients,
                     cookSteps);
 
@@ -97,6 +115,10 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "popularRecipes", allEntries = true),
+            @CacheEvict(value = "recipeDetail", key = "'rid'+#recipeId")})
+
     public void updateRecipe(Long recipeId, MultipartFile img, String username,
                              RecipeUpdateDto recipeUpdateDto) throws AccessDeniedException {
         // 1. 레시피 조회 및 수정 권한 확인
@@ -144,6 +166,10 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "popularRecipes", allEntries = true),
+            @CacheEvict(value = "recipeDetail", key = "'rid'+#recipeId")})
     public void deleteRecipe(Long recipeId, String username) throws AccessDeniedException {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new IllegalArgumentException("Recipe not found"));
         if (recipe.getUsername().equals(username)) {
@@ -172,9 +198,33 @@ public class RecipeServiceImpl implements RecipeService {
         ArrayList<String> urlList = new ArrayList<>(); // s3 로직 혹은 업로드 서버 설정 예정
         ArrayList<CookStep> cookStepList = new ArrayList<>();
         for (int i = 0; i < cookSteps.size(); i++) {
-            String url = (i<urlList.size())?urlList.get(i):"";
+            String url = (i < urlList.size()) ? urlList.get(i) : "";
             cookStepList.add(CookStep.makeCookStep(cookSteps.get(i), url));
         }
         return cookStepList;
+    }
+
+    public Page<PagingRecipeResponse> fallbackPopularRecipes(Pageable pageable, Throwable t) {
+        return recipeRepository.getPopularRecipes(pageable);
+    }
+
+    public RecipeDto fallbackGetRecipe(Long recipeId, Throwable t) {
+
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(EntityNotFoundException::new);
+        FoodInformationDto foodInformationDto = recipe.getFoodInformation().makeFoodInformationDto();
+        List<IngredientDto> ingredients = recipe.getIngredients().stream().map(Ingredient::makeIngredientDto).toList();
+        List<CookStepDto> cookStepDtos = recipe.getCookSteps().stream().map(CookStep::makeCookStepDto).toList();
+
+
+        return RecipeDto.builder()
+                .foodId(recipeId)
+                .foodName(recipe.getFoodName())
+                .recipeType(recipe.getRecipeType())
+                .foodInformation(foodInformationDto)
+                .foodImgUrl(recipe.getRecipeImgUrl())
+
+                .ingredients(ingredients)
+                .cookSteps(cookStepDtos)
+                .build();
     }
 }

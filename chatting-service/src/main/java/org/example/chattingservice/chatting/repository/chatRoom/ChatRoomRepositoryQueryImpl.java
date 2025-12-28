@@ -41,9 +41,14 @@ public class ChatRoomRepositoryQueryImpl  extends QuerydslRepositorySupport impl
                         chatRoom.chatRoomDescription
                 )).from(chatRoom)
                 .join(chatRoom.members, chatRoomMember)
-                .where(chatRoomMember.username.eq(username))
+                .where(chatRoomMember.username.eq(username)
+                        .and(chatRoomMember.deleted.isFalse()))
                 .fetchJoin();
-        Function<JPAQueryFactory, JPAQuery<Long>> countQuery = facctory -> createCountQuery(chatRoom);
+        Function<JPAQueryFactory, JPAQuery<Long>> countQuery = factory -> factory.select(chatRoom.id.countDistinct())
+                .from(chatRoom)
+                .join(chatRoom.members, chatRoomMember)
+                .where(chatRoomMember.username.eq(username)
+                        .and(chatRoomMember.deleted.isFalse()));
         return applyPagination(pageable, contentQuery, countQuery);
     }
 
