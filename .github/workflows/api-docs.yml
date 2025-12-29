@@ -1,0 +1,57 @@
+name: Publish API Docs
+
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Build REST Docs
+        run: ./gradlew :user-service:asciidoctor :recipe-service:asciidoctor :chatting-service:asciidoctor
+
+      - name: Assemble site
+        run: |
+          rm -rf site
+          mkdir -p site/user-service site/recipe-service site/chatting-service
+          cp -R user-service/build/docs/asciidoc/* site/user-service/
+          cp -R recipe-service/build/docs/asciidoc/* site/recipe-service/
+          cp -R chatting-service/build/docs/asciidoc/* site/chatting-service/
+          cp docs/api/index.html site/index.html
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
