@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Refactory API Docs</title>
+    <style>
+      :root {
+        --bg-start: #f4f0e8;
+        --bg-end: #e5edf5;
+        --text: #1f2a33;
+        --muted: #5b6b77;
+        --card: #ffffff;
+        --accent: #0b6b8c;
+        --border: #d7dde4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Georgia", "Times New Roman", serif;
+        color: var(--text);
+        background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        min-height: 100vh;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 48px 24px 64px;
+      }
+
+      h1 {
+        font-size: 2.6rem;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+
+      p {
+        margin: 0 0 24px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px 18px 20px;
+        box-shadow: 0 10px 30px rgba(10, 32, 48, 0.08);
+      }
+
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 1.3rem;
+      }
+
+      .card a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .card a:hover {
+        text-decoration: underline;
+      }
+
+      .note {
+        margin-top: 32px;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Refactory API Docs</h1>
+      <p>Service-level API documentation generated from controller tests with Spring REST Docs.</p>
+
+      <section class="grid">
+        <div class="card">
+          <h2>User Service</h2>
+          <p>Authentication, profile, and user deletion saga endpoints.</p>
+          <a href="user-service/index.html">Open user-service docs</a>
+        </div>
+        <div class="card">
+          <h2>Recipe Service</h2>
+          <p>Recipe listing, create/update, and detail endpoints.</p>
+          <a href="recipe-service/index.html">Open recipe-service docs</a>
+        </div>
+        <div class="card">
+          <h2>Chatting Service</h2>
+          <p>Chat room management and message access endpoints.</p>
+          <a href="chatting-service/index.html">Open chatting-service docs</a>
+        </div>
+      </section>
+
+      <p class="note">Note: WebSocket endpoints are documented in the chatting-service page.</p>
+    </main>
+  </body>
+</html>
