@@ -1,0 +1,63 @@
+= Recipe Service API
+:toc: left
+:toclevels: 2
+:sectnums:
+:snippets: {snippets}
+
+== Lists
+=== Popular Recipes
+include::{snippets}/recipes-popular/http-request.adoc[]
+include::{snippets}/recipes-popular/query-parameters.adoc[]
+include::{snippets}/recipes-popular/http-response.adoc[]
+include::{snippets}/recipes-popular/response-fields.adoc[]
+
+=== All Recipes
+include::{snippets}/recipes-list/http-request.adoc[]
+include::{snippets}/recipes-list/query-parameters.adoc[]
+include::{snippets}/recipes-list/http-response.adoc[]
+include::{snippets}/recipes-list/response-fields.adoc[]
+
+=== My Recipes
+include::{snippets}/recipes-mylist/http-request.adoc[]
+include::{snippets}/recipes-mylist/request-headers.adoc[]
+include::{snippets}/recipes-mylist/query-parameters.adoc[]
+include::{snippets}/recipes-mylist/http-response.adoc[]
+include::{snippets}/recipes-mylist/response-fields.adoc[]
+
+=== Search Recipes
+include::{snippets}/recipes-search/http-request.adoc[]
+include::{snippets}/recipes-search/path-parameters.adoc[]
+include::{snippets}/recipes-search/query-parameters.adoc[]
+include::{snippets}/recipes-search/http-response.adoc[]
+include::{snippets}/recipes-search/response-fields.adoc[]
+
+== Create and Update
+=== Create Recipe
+include::{snippets}/recipes-create/http-request.adoc[]
+include::{snippets}/recipes-create/request-headers.adoc[]
+include::{snippets}/recipes-create/request-parts.adoc[]
+include::{snippets}/recipes-create/request-part-data-fields.adoc[]
+include::{snippets}/recipes-create/http-response.adoc[]
+include::{snippets}/recipes-create/response-fields.adoc[]
+
+=== Update Recipe
+include::{snippets}/recipes-update/http-request.adoc[]
+include::{snippets}/recipes-update/path-parameters.adoc[]
+include::{snippets}/recipes-update/request-headers.adoc[]
+include::{snippets}/recipes-update/request-parts.adoc[]
+include::{snippets}/recipes-update/request-part-data-fields.adoc[]
+include::{snippets}/recipes-update/http-response.adoc[]
+include::{snippets}/recipes-update/response-fields.adoc[]
+
+== Detail and Delete
+=== Recipe Detail
+include::{snippets}/recipes-detail/http-request.adoc[]
+include::{snippets}/recipes-detail/path-parameters.adoc[]
+include::{snippets}/recipes-detail/http-response.adoc[]
+include::{snippets}/recipes-detail/response-fields.adoc[]
+
+=== Delete Recipe
+include::{snippets}/recipes-delete/http-request.adoc[]
+include::{snippets}/recipes-delete/path-parameters.adoc[]
+include::{snippets}/recipes-delete/request-headers.adoc[]
+include::{snippets}/recipes-delete/http-response.adoc[]

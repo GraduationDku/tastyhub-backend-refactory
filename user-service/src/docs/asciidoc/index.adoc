@@ -1,0 +1,64 @@
+= User Service API
+:toc: left
+:toclevels: 2
+:sectnums:
+:snippets: {snippets}
+
+== Authentication
+=== Apple Login
+include::{snippets}/users-login-apple/http-request.adoc[]
+include::{snippets}/users-login-apple/request-fields.adoc[]
+include::{snippets}/users-login-apple/http-response.adoc[]
+include::{snippets}/users-login-apple/response-fields.adoc[]
+
+=== Refresh Access Token
+include::{snippets}/users-refresh-token/http-request.adoc[]
+include::{snippets}/users-refresh-token/request-headers.adoc[]
+include::{snippets}/users-refresh-token/http-response.adoc[]
+include::{snippets}/users-refresh-token/response-fields.adoc[]
+
+== User Search
+=== Search Users
+include::{snippets}/users-search/http-request.adoc[]
+include::{snippets}/users-search/query-parameters.adoc[]
+include::{snippets}/users-search/http-response.adoc[]
+include::{snippets}/users-search/response-fields.adoc[]
+
+== User Deletion
+=== Request Deletion
+include::{snippets}/users-delete/http-request.adoc[]
+include::{snippets}/users-delete/request-headers.adoc[]
+include::{snippets}/users-delete/http-response.adoc[]
+include::{snippets}/users-delete/response-fields.adoc[]
+
+=== Deletion Status
+include::{snippets}/users-delete-status/http-request.adoc[]
+include::{snippets}/users-delete-status/path-parameters.adoc[]
+include::{snippets}/users-delete-status/http-response.adoc[]
+include::{snippets}/users-delete-status/response-fields.adoc[]
+
+== Session
+=== Logout
+include::{snippets}/users-logout/http-request.adoc[]
+include::{snippets}/users-logout/request-headers.adoc[]
+include::{snippets}/users-logout/http-response.adoc[]
+include::{snippets}/users-logout/response-fields.adoc[]
+
+== Profile
+=== Update User Info
+include::{snippets}/users-update-info/http-request.adoc[]
+include::{snippets}/users-update-info/request-headers.adoc[]
+include::{snippets}/users-update-info/request-parts.adoc[]
+include::{snippets}/users-update-info/http-response.adoc[]
+include::{snippets}/users-update-info/response-fields.adoc[]
+
+=== Get User Nickname
+include::{snippets}/users-nickname/http-request.adoc[]
+include::{snippets}/users-nickname/query-parameters.adoc[]
+include::{snippets}/users-nickname/http-response.adoc[]
+include::{snippets}/users-nickname/response-fields.adoc[]
+
+== Health
+=== Hello
+include::{snippets}/users-hello/http-request.adoc[]
+include::{snippets}/users-hello/http-response.adoc[]

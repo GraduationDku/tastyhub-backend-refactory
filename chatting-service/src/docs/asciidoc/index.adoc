@@ -1,0 +1,52 @@
+= Chatting Service API
+:toc: left
+:toclevels: 2
+:sectnums:
+:snippets: {snippets}
+
+== Chat Rooms
+=== Create Chat Room
+include::{snippets}/chatting-create-room/http-request.adoc[]
+include::{snippets}/chatting-create-room/request-headers.adoc[]
+include::{snippets}/chatting-create-room/request-fields.adoc[]
+include::{snippets}/chatting-create-room/http-response.adoc[]
+include::{snippets}/chatting-create-room/response-fields.adoc[]
+
+=== List Chat Rooms
+include::{snippets}/chatting-room-list/http-request.adoc[]
+include::{snippets}/chatting-room-list/request-headers.adoc[]
+include::{snippets}/chatting-room-list/query-parameters.adoc[]
+include::{snippets}/chatting-room-list/http-response.adoc[]
+include::{snippets}/chatting-room-list/response-fields.adoc[]
+
+=== Chat Room Detail
+include::{snippets}/chatting-room-detail/http-request.adoc[]
+include::{snippets}/chatting-room-detail/path-parameters.adoc[]
+include::{snippets}/chatting-room-detail/request-headers.adoc[]
+include::{snippets}/chatting-room-detail/http-response.adoc[]
+include::{snippets}/chatting-room-detail/response-fields.adoc[]
+
+=== Enter Chat Room
+include::{snippets}/chatting-room-enter/http-request.adoc[]
+include::{snippets}/chatting-room-enter/path-parameters.adoc[]
+include::{snippets}/chatting-room-enter/request-headers.adoc[]
+include::{snippets}/chatting-room-enter/http-response.adoc[]
+include::{snippets}/chatting-room-enter/response-fields.adoc[]
+
+=== Leave Chat Room
+include::{snippets}/chatting-room-leave/http-request.adoc[]
+include::{snippets}/chatting-room-leave/path-parameters.adoc[]
+include::{snippets}/chatting-room-leave/request-headers.adoc[]
+include::{snippets}/chatting-room-leave/http-response.adoc[]
+
+=== Delete Chat Room
+include::{snippets}/chatting-room-delete/http-request.adoc[]
+include::{snippets}/chatting-room-delete/path-parameters.adoc[]
+include::{snippets}/chatting-room-delete/request-headers.adoc[]
+include::{snippets}/chatting-room-delete/http-response.adoc[]
+
+== WebSocket Messaging
+This service also supports STOMP over WebSocket.
+
+* Publish: `/app/rooms/{roomId}`
+* Subscribe: `/topic/rooms/{roomId}`

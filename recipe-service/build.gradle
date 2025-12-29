@@ -31,7 +31,16 @@ tasks.named('test') {
 	outputs.dir snippetsDir
 }
 
+tasks.register('restDocsTest', Test) {
+	description = 'Runs REST Docs tests.'
+	group = 'verification'
+	useJUnitPlatform()
+	outputs.dir snippetsDir
+	include '**/*RestDocsTest.class'
+}
+
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
-	dependsOn test
+	dependsOn restDocsTest
+	attributes 'snippets': snippetsDir
 }
