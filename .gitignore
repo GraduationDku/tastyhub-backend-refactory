@@ -3,6 +3,7 @@ application.yaml
 .gradle
 *.p8
 *.html
+!docs/api/index.html
 application.yml
 
 **/build/
